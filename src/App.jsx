@@ -209,12 +209,9 @@ function App() {
         const cred = await createUserWithEmailAndPassword(firebaseAuth, authForm.email, authForm.password);
         await updateProfile(cred.user, { displayName: authForm.name });
         const role = authForm.email === 'tilakmishra.76@gmail.com' ? 'admin' : 'student';
-        const uData = { name: authForm.name, email: authForm.email, role, isApproved: role === 'admin', createdAt: new Date().toISOString() };
+        const uData = { name: authForm.name, email: authForm.email, role, isApproved: true, createdAt: new Date().toISOString() };
         await setDoc(doc(firestoreDb, 'users', cred.user.uid), uData);
-        if (role !== 'admin') {
-          await signOut(firebaseAuth);
-          showToast('Registered! Please wait for Admin approval.', 'info');
-        }
+        showToast('Registration Successful! Welcome to Exam Cracker.', 'success');
       }
     } catch (err) { setAuthError(err.message); }
     setLoading(false);
@@ -450,7 +447,7 @@ function App() {
 
         <nav className="nav-menu">
           {navItems.map((item) => {
-            const isLocked = user?.role === 'student' && !user?.isApproved && item.name !== 'Dashboard';
+            const isLocked = false; // All features unlocked for everyone
             return (
               <div
                 key={item.name}
@@ -493,7 +490,7 @@ function App() {
         </header>
 
         <section className="content-area">
-          {user?.role === 'student' && !user?.isApproved ? (
+          {false ? ( // Disable the verification screen
             <div className="panel" style={{ textAlign: 'center', padding: '5rem 2rem', margin: '2rem auto', maxWidth: '700px', borderRadius: '24px', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '8px', background: 'linear-gradient(90deg, #f59e0b, #fbbf24)' }}></div>
               <div style={{ background: 'rgba(245, 158, 11, 0.1)', width: '100px', height: '100px', borderRadius: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2.5rem', color: '#f59e0b', transform: 'rotate(10deg)' }}>
