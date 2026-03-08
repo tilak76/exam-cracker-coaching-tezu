@@ -542,7 +542,7 @@ function App() {
                       <div style={{ background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(129, 140, 248, 0.1) 100%)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '2.5rem', borderRadius: '24px', marginTop: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backdropFilter: 'blur(10px)', animation: 'slide-in 0.5s ease' }}>
                         <div style={{ maxWidth: '60%' }}>
                           <h3 style={{ fontSize: '1.75rem', fontWeight: '900', color: 'white', marginBottom: '8px' }}>Join the Exam Cracker Elite! 🎯</h3>
-                          <p style={{ margin: 0, color: '#94a3b8', fontSize: '1rem', lineHeight: '1.6' }}>Create a free account to track your progress, attend live classes, and solve premium test series.</p>
+                          <p style={{ margin: 0, color: '#94a3b8', fontSize: '1rem', lineHeight: '1.6' }}>Create a free account to track your progress, access premium study material, and solve test series.</p>
                         </div>
                         <div style={{ display: 'flex', gap: '1rem' }}>
                           <button className="btn" onClick={() => { setIsLoginView(true); setShowAuthModal(true); }} style={{ padding: '1rem 2rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', fontWeight: '700', borderRadius: '14px' }}>Login</button>
@@ -1226,7 +1226,7 @@ function App() {
                   </div>
                 )}
 
-                {activeTab !== 'Dashboard' && activeTab !== 'Admin Panel' && activeTab !== 'Classes' && activeTab !== 'Assignments' && activeTab !== 'Study Material' && activeTab !== 'Tests' && activeTab !== 'Attendance' && activeTab !== 'Students' && (
+                {activeTab !== 'Dashboard' && activeTab !== 'Admin Panel' && activeTab !== 'Assignments' && activeTab !== 'Study Material' && activeTab !== 'Tests' && activeTab !== 'Attendance' && activeTab !== 'Students' && (
                   <div className="panel" style={{ textAlign: 'center', padding: '100px 20px' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="64" height="64" style={{ color: 'var(--text-secondary)', margin: '0 auto 1.5rem' }}>
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
