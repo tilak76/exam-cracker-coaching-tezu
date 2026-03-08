@@ -96,7 +96,6 @@ function App() {
 
   const navItems = [
     { name: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
-    { name: 'Classes', icon: 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z' },
     { name: 'Assignments', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
     { name: 'Study Material', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
     { name: 'Tests', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' }
@@ -461,11 +460,22 @@ function App() {
 
       <main className="main-content">
         <header className="topbar">
-          <div className="search-bar">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" style={{ color: 'var(--text-secondary)' }}>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input type="text" placeholder="Search students, classes..." />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            {activeTab !== 'Dashboard' && (
+              <button
+                onClick={() => setActiveTab('Dashboard')}
+                style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-glass)', color: 'var(--text-primary)', padding: '0.4rem 0.8rem', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: '500' }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                Back to Dashboard
+              </button>
+            )}
+            <div className="search-bar">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" style={{ color: 'var(--text-secondary)' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input type="text" placeholder="Search resources..." />
+            </div>
           </div>
 
           <div className="user-profile">
@@ -606,61 +616,109 @@ function App() {
 
                     <div className="panel">
                       <div className="panel-header">
-                        <h3 className="panel-title">📝 Latest Assignments</h3>
+                        <h3 className="panel-title">Latest Assignments</h3>
                         <button className="btn btn-primary" onClick={() => setActiveTab('Assignments')} style={{ background: 'var(--bg-glass)', color: '#10b981' }}>View All</button>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                        {[...assignments].reverse().slice(0, 3).map((as, idx) => (
-                          <div key={idx} style={{ background: 'rgba(0,0,0,0.2)', padding: '0.75rem', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                              <p style={{ fontWeight: 'bold', margin: 0 }}>{as.title}</p>
-                              <small style={{ color: 'var(--text-secondary)' }}>Due: {as.deadline}</small>
+                        {[...assignments].reverse().slice(0, 3).map((as, idx) => {
+                          const isRestricted = (!user || (user?.role === 'student' && !user?.isApproved)) && idx >= 2;
+                          return (
+                            <div key={idx}
+                              onClick={() => {
+                                if (isRestricted) {
+                                  setShowAuthModal(true);
+                                  showToast('Verify account to access premium assignments', 'warning');
+                                } else {
+                                  window.open(as.fileUrl || as.link, '_blank');
+                                }
+                              }}
+                              style={{ background: 'rgba(0,0,0,0.2)', padding: '0.75rem', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', opacity: isRestricted ? 0.6 : 1, border: '1px solid rgba(255,255,255,0.05)' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                <div style={{ color: isRestricted ? 'var(--text-secondary)' : '#10b981' }}>
+                                  {isRestricted ? <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9z" /></svg> : <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8"></polyline></svg>}
+                                </div>
+                                <div>
+                                  <p style={{ fontWeight: '600', margin: 0, fontSize: '0.9rem' }}>{as.title}</p>
+                                  <small style={{ color: 'var(--text-secondary)' }}>Due: {as.deadline}</small>
+                                </div>
+                              </div>
+                              <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px', background: isRestricted ? 'rgba(255,255,255,0.05)' : 'rgba(16, 185, 129, 0.1)', color: isRestricted ? 'var(--text-secondary)' : '#10b981' }}>{idx < 2 ? 'Free' : 'Premium'}</span>
                             </div>
-                            <span style={{ fontSize: '0.8rem', padding: '2px 8px', borderRadius: '4px', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>New</span>
-                          </div>
-                        ))}
-                        {assignments.length === 0 && <p style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>No assignments yet.</p>}
+                          );
+                        })}
+                        {assignments.length === 0 && <p style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>No assignments listed.</p>}
                       </div>
                     </div>
 
                     <div className="panel">
                       <div className="panel-header">
-                        <h3 className="panel-title">🏆 Upcoming Tests</h3>
-                        <button className="btn btn-primary" onClick={() => setActiveTab('Tests')} style={{ background: 'var(--bg-glass)', color: '#f59e0b' }}>Go to Tests</button>
+                        <h3 className="panel-title">Upcoming Tests</h3>
+                        <button className="btn btn-primary" onClick={() => setActiveTab('Tests')} style={{ background: 'var(--bg-glass)', color: '#f59e0b' }}>Go to Arena</button>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                        {[...tests].reverse().slice(0, 3).map((t, idx) => (
-                          <div key={idx} style={{ background: 'rgba(0,0,0,0.2)', padding: '0.75rem', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                              <p style={{ fontWeight: 'bold', margin: 0 }}>{t.title}</p>
-                              <small style={{ color: 'var(--text-secondary)' }}>{t.durationMinutes} Mins • {t.questionsCount} Qs</small>
+                        {[...tests].reverse().slice(0, 3).map((t, idx) => {
+                          const isRestricted = (!user || (user?.role === 'student' && !user?.isApproved)) && idx >= 2;
+                          return (
+                            <div key={idx}
+                              onClick={() => {
+                                if (isRestricted) {
+                                  setShowAuthModal(true);
+                                  showToast('Account verification required for full access', 'warning');
+                                } else {
+                                  setActiveTab('Tests');
+                                  setActiveTest(t);
+                                }
+                              }}
+                              style={{ background: 'rgba(0,0,0,0.2)', padding: '0.75rem', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', opacity: isRestricted ? 0.6 : 1, border: '1px solid rgba(255,255,255,0.05)' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                <div style={{ color: isRestricted ? 'var(--text-secondary)' : '#f59e0b' }}>
+                                  {isRestricted ? <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9z" /></svg> : <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+                                </div>
+                                <div>
+                                  <p style={{ fontWeight: '600', margin: 0, fontSize: '0.9rem' }}>{t.title}</p>
+                                  <small style={{ color: 'var(--text-secondary)' }}>{t.durationMinutes} Mins • {t.questionsCount} Qs</small>
+                                </div>
+                              </div>
+                              <div style={{ color: isRestricted ? 'var(--text-secondary)' : '#f59e0b', fontWeight: 'bold', fontSize: '0.85rem' }}>{idx < 2 ? 'Start' : 'Locked'}</div>
                             </div>
-                            <div style={{ color: '#f59e0b', fontWeight: 'bold' }}>⏱ Take</div>
-                          </div>
-                        ))}
+                          );
+                        })}
                         {tests.length === 0 && <p style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>No tests scheduled.</p>}
                       </div>
                     </div>
 
                     <div className="panel">
                       <div className="panel-header">
-                        <h3 className="panel-title">📚 Study Material</h3>
-                        <button className="btn btn-primary" onClick={() => setActiveTab('Study Material')} style={{ background: 'var(--bg-glass)', color: '#3b82f6' }}>View Library</button>
+                        <h3 className="panel-title">Study Resources</h3>
+                        <button className="btn btn-primary" onClick={() => setActiveTab('Study Material')} style={{ background: 'var(--bg-glass)', color: '#3b82f6' }}>View All</button>
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                        {[...notes].reverse().slice(0, 4).map((n, idx) => (
-                          <div key={idx} style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', padding: '0.75rem', borderRadius: '8px', textAlign: 'center' }}>
-                            <p style={{ fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.title}</p>
-                            <small style={{ color: 'var(--text-secondary)' }}>{n.subject}</small>
-                          </div>
-                        ))}
-                        {notes.length === 0 && <p style={{ color: 'var(--text-secondary)', textAlign: 'center', gridColumn: '1/-1' }}>No material uploaded.</p>}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                        {[...notes].reverse().slice(0, 4).map((n, idx) => {
+                          const isRestricted = (!user || (user?.role === 'student' && !user?.isApproved)) && idx >= 2;
+                          return (
+                            <div key={idx}
+                              onClick={() => {
+                                if (isRestricted) {
+                                  setShowAuthModal(true);
+                                  showToast('Members only content', 'warning');
+                                } else {
+                                  window.open(n.fileUrl || n.link, '_blank');
+                                }
+                              }}
+                              style={{ background: 'rgba(59, 130, 246, 0.05)', border: '1px solid rgba(59, 130, 246, 0.1)', padding: '1rem', borderRadius: '14px', textAlign: 'center', cursor: 'pointer', opacity: isRestricted ? 0.5 : 1 }}>
+                              {isRestricted ? <svg style={{ width: '14px', height: '14px', marginBottom: '8px', color: 'var(--text-secondary)' }} fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9z" /></svg> : <div style={{ fontSize: '1.2rem', marginBottom: '8px' }}>📄</div>}
+                              <p style={{ fontSize: '0.85rem', fontWeight: '700', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--text-primary)' }}>{n.title}</p>
+                              <small style={{ color: 'var(--text-secondary)', display: 'block', textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '0.05em' }}>{idx < 2 ? 'Free Access' : 'Private'}</small>
+                            </div>
+                          );
+                        })}
+                        {notes.length === 0 && <p style={{ color: 'var(--text-secondary)', textAlign: 'center', gridColumn: '1/-1' }}>Resources pending.</p>}
                       </div>
                     </div>
 
                     <div className="panel" style={{ gridColumn: '1 / -1' }}>
                       <div className="panel-header">
-                        <h3 className="panel-title">🔔 Recent Activity</h3>
+                        <h3 className="panel-title">Recent Activity</h3>
                       </div>
                       <div className="activity-list" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
                         {recentActivities.length > 0 ? recentActivities.slice(0, 4).map((act, i) => (
