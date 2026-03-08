@@ -34,6 +34,8 @@ function App() {
   const [authError, setAuthError] = useState('');
   const [isLoginView, setIsLoginView] = useState(true);
   const [authForm, setAuthForm] = useState({ name: '', email: '', password: '' });
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [welcomeText, setWelcomeText] = useState('Welcome back, Warrior! 🎯');
 
   const [stats, setStats] = useState([
     { title: 'Total Students', value: '0', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197' },
@@ -94,11 +96,17 @@ function App() {
 
   const navItems = [
     { name: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
-    { name: 'Classes', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
-    { name: 'Assignments', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
+    { name: 'Classes', icon: 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z' },
+    { name: 'Assignments', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
     { name: 'Study Material', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
     { name: 'Tests', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' }
   ];
+
+  if (user?.role === 'admin') {
+    if (!navItems.some(i => i.name === 'Students')) navItems.push({ name: 'Students', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197' });
+    if (!navItems.some(i => i.name === 'Attendance')) navItems.push({ name: 'Attendance', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' });
+    if (!navItems.some(i => i.name === 'Admin Panel')) navItems.push({ name: 'Admin Panel', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37' });
+  }
 
   // Auth Observer
   useEffect(() => {
@@ -405,71 +413,46 @@ function App() {
     }
   }
 
-  if (user?.role === 'admin' && !navItems.some(item => item.name === 'Students')) {
-    navItems.push({ name: 'Students', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197' });
-    navItems.push({ name: 'Attendance', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' });
-    navItems.push({ name: 'Admin Panel', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37' });
-  }
-
-  if (token && loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column', color: 'white' }}>
-        <div className="spinner"></div>
-        <p style={{ marginTop: '1rem' }}>Loading dashboard data...</p>
-      </div>
-    );
-  }
-
-  if (!token) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
-        <div className="panel" style={{ width: '400px', padding: '2rem' }}>
-          <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Exam Cracker <br /> Coaching Centre</h2>
-          <h3 style={{ textAlign: 'center', marginBottom: '1rem', color: 'var(--text-secondary)' }}>{isLoginView ? 'Student Login' : 'Student Sign Up'}</h3>
-          {authError && <div style={{ color: '#ef4444', marginBottom: '1rem', textAlign: 'center' }}>{authError}</div>}
-          <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {!isLoginView && (
-              <input style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white' }} placeholder="Full Name" value={authForm.name} onChange={e => setAuthForm({ ...authForm, name: e.target.value })} required />
-            )}
-            <input type="email" style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white' }} placeholder="Email Address" value={authForm.email} onChange={e => setAuthForm({ ...authForm, email: e.target.value })} required />
-            <input type="password" style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white' }} placeholder="Password" value={authForm.password} onChange={e => setAuthForm({ ...authForm, password: e.target.value })} required />
-            <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? 'Processing...' : (isLoginView ? 'Log In' : 'Sign Up')}</button>
-          </form>
-          {isLoginView && (
-            <p style={{ textAlign: 'center', marginTop: '1rem', color: '#3b82f6', fontSize: '0.875rem', cursor: 'pointer', fontWeight: '500' }} onClick={handleResetPassword}>
-              Forgot Password?
-            </p>
-          )}
-          <p style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--text-secondary)', cursor: 'pointer' }} onClick={() => setIsLoginView(!isLoginView)}>
-            {isLoginView ? "Don't have an account? Sign Up" : "Already have an account? Log In"}
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
       <aside className="sidebar">
         <div className="brand">
-          <div className="brand-icon">EX</div>
-          <h1>Exam Cracker<br />Coaching Centre</h1>
+          <div className="brand-logo-container">
+            <div className="brand-shape"></div>
+            <div className="brand-icon">EC</div>
+          </div>
+          <h1>Exam Cracker <span>Student Portal</span></h1>
         </div>
 
         <nav className="nav-menu">
           {navItems.map((item) => {
-            const isLocked = user?.role === 'student' && !user?.isApproved && item.name !== 'Dashboard';
+            const isLocked = (!user || (user?.role === 'student' && !user?.isApproved)) && item.name !== 'Dashboard';
             return (
               <div
                 key={item.name}
                 className={`nav-item ${activeTab === item.name ? 'active' : ''}`}
-                onClick={() => !isLocked && setActiveTab(item.name)}
-                style={{ opacity: isLocked ? 0.4 : 1, cursor: isLocked ? 'not-allowed' : 'pointer' }}
+                onClick={() => {
+                  if (isLocked) {
+                    if (!user) {
+                      setShowAuthModal(true);
+                      showToast('Please login to access this feature.', 'warning');
+                    } else {
+                      showToast('Account verification pending.', 'warning');
+                    }
+                  } else {
+                    setActiveTab(item.name);
+                  }
+                }}
+                style={{ opacity: isLocked ? 0.4 : 1, cursor: 'pointer' }}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
-                </svg>
-                <span>{item.name} {isLocked && '🔒'}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="22" height="22">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
+                  </svg>
+                  <span>{item.name}</span>
+                </div>
+                {isLocked && <div style={{ fontSize: '0.8rem' }}>🔒</div>}
               </div>
             );
           })}
@@ -486,17 +469,26 @@ function App() {
           </div>
 
           <div className="user-profile">
-            <button className="btn" onClick={logout} style={{ padding: '0.5rem 1rem', fontSize: '0.875rem', background: '#ef4444', color: 'white' }}>
-              Logout
-            </button>
-            <div className="avatar">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" style={{ color: 'var(--text-primary)' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-            </div>
-            <div className="avatar">
-              <img src={`https://ui-avatars.com/api/?name=${user?.name || 'Student'}&background=random&color=fff`} alt={user?.name || "Student"} style={{ borderRadius: '50%', width: '100%' }} />
-            </div>
+            {!user ? (
+              <div style={{ display: 'flex', gap: '0.8rem' }}>
+                <button className="btn" onClick={() => { setIsLoginView(true); setShowAuthModal(true); }} style={{ padding: '0.5rem 1.25rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.85rem', fontWeight: '600' }}>Login</button>
+                <button className="btn btn-primary" onClick={() => { setIsLoginView(false); setShowAuthModal(true); }} style={{ padding: '0.5rem 1.25rem', fontSize: '0.85rem' }}>Join Now</button>
+              </div>
+            ) : (
+              <>
+                <button className="btn" onClick={logout} style={{ padding: '0.5rem 1rem', fontSize: '0.875rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                  Logout
+                </button>
+                <div className="avatar">
+                  <svg style={{ width: '20px', height: '20px', color: 'var(--text-primary)' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </svg>
+                </div>
+                <div className="avatar">
+                  <img src={`https://ui-avatars.com/api/?name=${user?.name || 'Student'}&background=random&color=fff`} alt={user?.name || "Student"} style={{ borderRadius: '50%', width: '100%' }} />
+                </div>
+              </>
+            )}
           </div>
         </header>
 
@@ -504,14 +496,14 @@ function App() {
           {user?.role === 'student' && !user?.isApproved ? (
             <div className="panel" style={{ textAlign: 'center', padding: '5rem 2rem', margin: '2rem auto', maxWidth: '700px', borderRadius: '24px', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '8px', background: 'linear-gradient(90deg, #f59e0b, #fbbf24)' }}></div>
-              <div style={{ background: 'rgba(245, 158, 11, 0.1)', width: '100px', height: '100px', borderRadius: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2.5rem', color: '#f59e0b', transform: 'rotate(10deg)' }}>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="48" height="48">
+              <div style={{ background: 'rgba(245, 158, 11, 0.1)', width: '80px', height: '80px', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: '#f59e0b', transform: 'rotate(10deg)' }}>
+                <svg style={{ width: '40px', height: '40px' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
               <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '1.5rem', background: 'linear-gradient(135deg, #fff 0%, #94a3b8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Account Verification <br /> Underway! ⏳</h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem', lineHeight: '1.8', marginBottom: '3rem', maxWidth: '500px', margin: '0 auto 3rem' }}>
-                Hello <strong>{user?.name}</strong>, we've received your registration for <strong>Exam Cracker Coaching Centre</strong>. Our admins are currently verifying your details.
+                Hello <strong>{user?.name || 'Warrior'}</strong>, we've received your registration for <strong>Exam Cracker Coaching Centre</strong>. Our admins are currently verifying your details.
               </p>
               <div style={{ background: 'var(--bg-glass)', padding: '2rem', borderRadius: '16px', border: '1px solid var(--border-glass)', marginBottom: '3rem' }}>
                 <p style={{ margin: 0, fontSize: '1rem', color: 'var(--text-primary)' }}>
@@ -521,7 +513,7 @@ function App() {
                   3. For urgent access, please contact <strong>Tilak Mishra Sir</strong>.
                 </p>
               </div>
-              <button className="btn" onClick={logout} style={{ padding: '1rem 2.5rem', borderRadius: '14px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', fontWeight: '700', transition: 'all 0.3s' }}>
+              <button className="btn" onClick={logout} style={{ padding: '1rem 2.5rem', borderRadius: '14px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', fontWeight: '700' }}>
                 Check Status Later
               </button>
             </div>
@@ -531,20 +523,18 @@ function App() {
                 {activeTab} {activeTab === 'Admin Panel' ? 'Controls' : 'Overview'}
               </h2>
 
-              {uploadStatus && (
-                <div style={{ background: '#38bdf8', color: 'black', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', fontWeight: 'bold' }}>
-                  {uploadStatus}
-                </div>
-              )}
-
               {activeTab === 'Dashboard' && (
                 <>
-                  <div style={{ background: 'var(--accent-gradient)', padding: '2.5rem', borderRadius: '24px', marginBottom: '2rem', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ background: 'var(--surface-gradient)', border: '1px solid var(--border-glass)', padding: '2rem', borderRadius: 'var(--panel-radius)', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 20px 50px rgba(0,0,0,0.3)', position: 'relative', overflow: 'hidden' }}>
                     <div style={{ position: 'relative', zIndex: 1 }}>
-                      <h1 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '0.5rem' }}>Jai Hind, {user?.name || 'Warrior'}! 🇮🇳</h1>
-                      <p style={{ fontSize: '1.1rem', opacity: 0.9 }}>Your preparation journey is on track. Let's conquer the next exam together.</p>
+                      <h1 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '8px', letterSpacing: '-0.02em', background: 'linear-gradient(to right, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                        Education Overview
+                      </h1>
+                      <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: '500' }}>
+                        Welcome to your dashboard, {user?.name || 'Warrior'}. Track your academic journey and solve tests.
+                      </p>
                     </div>
-                    <div style={{ position: 'absolute', right: '-20px', top: '-20px', fontSize: '10rem', opacity: 0.1, pointerEvents: 'none' }}>🎯</div>
+                    <div style={{ display: 'none' }}>🎯</div>
                   </div>
 
                   <div className="stats-grid">
@@ -569,6 +559,19 @@ function App() {
                       </>
                     )}
                   </div>
+
+                  {!user && (
+                    <div style={{ background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(129, 140, 248, 0.1) 100%)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '2.5rem', borderRadius: '24px', marginTop: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backdropFilter: 'blur(10px)', animation: 'slide-in 0.5s ease' }}>
+                      <div style={{ maxWidth: '60%' }}>
+                        <h3 style={{ fontSize: '1.75rem', fontWeight: '900', color: 'white', marginBottom: '8px' }}>Join the Exam Cracker Elite! 🎯</h3>
+                        <p style={{ margin: 0, color: '#94a3b8', fontSize: '1rem', lineHeight: '1.6' }}>Create a free account to track your progress, attend live classes, and solve premium test series.</p>
+                      </div>
+                      <div style={{ display: 'flex', gap: '1rem' }}>
+                        <button className="btn" onClick={() => { setIsLoginView(true); setShowAuthModal(true); }} style={{ padding: '1rem 2rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', fontWeight: '700', borderRadius: '14px' }}>Login</button>
+                        <button className="btn btn-primary" onClick={() => { setIsLoginView(false); setShowAuthModal(true); }} style={{ padding: '1rem 2.5rem', fontWeight: '900', borderRadius: '14px', boxShadow: '0 10px 30px rgba(56, 189, 248, 0.3)' }}>Join Now</button>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="dashboard-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
                     <div className="panel">
@@ -1209,97 +1212,166 @@ function App() {
             </>
           )}
         </section>
-      </main>
+      </main >
 
-      {/* Custom Toast Notification */}
-      <div className={`fixed bottom-8 right-8 z-[9999] transform transition-all duration-500 ease-out ${toast.visible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-20 opacity-0 scale-90 pointer-events-none'}`}>
-        <div className={`px-6 py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center space-x-4 border border-white/10 backdrop-blur-xl ${toast.type === 'success' ? 'bg-gradient-to-r from-emerald-500 to-teal-600' :
-          toast.type === 'error' ? 'bg-gradient-to-r from-rose-500 to-red-600' :
-            'bg-gradient-to-r from-blue-500 to-indigo-600'
-          } text-white`}>
-          <div className="bg-white/20 p-2 rounded-lg">
-            {toast.type === 'success' && <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>}
-            {toast.type === 'error' && <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>}
-            {toast.type === 'info' && <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>}
+      {/* Custom Notification Toast */}
+      {
+        toast.visible && (
+          <div className="toast-vanilla" style={{
+            position: 'fixed', bottom: '30px', right: '30px', zIndex: 12000,
+            background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '16px', padding: '12px 20px', display: 'flex', alignItems: 'center',
+            gap: '12px', boxShadow: '0 15px 40px rgba(0,0,0,0.4)', backdropFilter: 'blur(10px)',
+            animation: 'slide-in 0.3s ease-out', borderLeft: `6px solid ${toast.type === 'success' ? '#10b981' : '#ef4444'}`
+          }}>
+            <div style={{ color: toast.type === 'success' ? '#10b981' : '#ef4444', display: 'flex' }}>
+              {toast.type === 'success' ? (
+                <svg style={{ width: '24px', height: '24px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>
+              ) : (
+                <svg style={{ width: '24px', height: '24px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              )}
+            </div>
+            <span style={{ fontSize: '0.95rem', fontWeight: '700', color: 'white', whiteSpace: 'nowrap' }}>{toast.message}</span>
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-lg leading-tight capitalize">{toast.type}</span>
-            <span className="text-sm font-medium opacity-90">{toast.message}</span>
-          </div>
-        </div>
-      </div>
+        )
+      }
 
       {/* Custom Confirmation Modal */}
-      {confirmDialog.visible && (
-        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setConfirmDialog({ ...confirmDialog, visible: false })}></div>
-          <div className="relative bg-[#1a1c1e] border border-white/10 rounded-3xl p-8 max-w-md w-full shadow-2xl transform transition-all scale-110 animate-fade-in">
-            <div className="bg-red-500/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 border border-red-500/20">
-              <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-            </div>
-            <h3 className="text-2xl font-bold text-white mb-2">{confirmDialog.title}</h3>
-            <p className="text-gray-400 mb-8 leading-relaxed">{confirmDialog.message}</p>
-            <div className="flex gap-4">
-              <button
-                onClick={() => setConfirmDialog({ ...confirmDialog, visible: false })}
-                className="flex-1 px-6 py-4 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-white/5"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={async () => {
-                  await confirmDialog.onConfirm();
-                  setConfirmDialog({ ...confirmDialog, visible: false });
-                }}
-                className="flex-1 px-6 py-4 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white font-semibold shadow-lg shadow-red-500/30 hover:brightness-110 transition-all"
-              >
-                Delete
-              </button>
+      {
+        confirmDialog.visible && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }} onClick={() => setConfirmDialog({ ...confirmDialog, visible: false })}></div>
+            <div style={{ position: 'relative', background: '#1a1c1e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '32px', padding: '2.5rem', maxWidth: '420px', width: '100%', boxShadow: '0 50px 100px rgba(0,0,0,0.8)', animation: 'slide-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}>
+              <div style={{ background: 'rgba(239, 68, 68, 0.1)', width: '56px', height: '56px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                <svg style={{ width: '28px', height: '28px' }} color="#ef4444" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+              </div>
+              <h3 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'white', marginBottom: '8px' }}>{confirmDialog.title}</h3>
+              <p style={{ color: '#94a3b8', marginBottom: '2rem', lineHeight: '1.6' }}>{confirmDialog.message}</p>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button
+                  onClick={() => setConfirmDialog({ ...confirmDialog, visible: false })}
+                  style={{ flex: 1, padding: '1rem', borderRadius: '14px', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', fontWeight: '700', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    await confirmDialog.onConfirm();
+                    setConfirmDialog({ ...confirmDialog, visible: false });
+                  }}
+                  style={{ flex: 1, padding: '1rem', borderRadius: '14px', background: 'linear-gradient(135deg, #ef4444, #b91c1c)', color: 'white', border: 'none', fontWeight: '700', cursor: 'pointer', boxShadow: '0 8px 20px rgba(239, 68, 68, 0.3)' }}
+                >
+                  Confirm
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
-      {/* Welcome Popup */}
-      {showWelcome && (
-        <div className="fixed inset-0 z-[11000] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-xl animate-fade-in" onClick={() => setShowWelcome(false)}></div>
-          <div className="relative bg-[#1a1c1e] border border-white/10 rounded-[32px] p-10 max-w-lg w-full shadow-[0_50px_100px_rgba(0,0,0,0.5)] transform transition-all scale-100 animate-slide-in text-center overflow-hidden">
-            {/* Background Glow */}
-            <div className="absolute -top-24 -left-24 w-48 h-48 bg-blue-500/20 blur-[100px]"></div>
-            <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-indigo-500/20 blur-[100px]"></div>
+      {/* Refined Welcome Popup */}
+      {
+        showWelcome && (
+          <div style={{
+            position: 'fixed', inset: 0, zIndex: 11000, display: 'flex', alignItems: 'center',
+            justifyContent: 'center', padding: '20px', background: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(10px)'
+          }}>
+            <div style={{
+              background: '#1a1c1e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '28px',
+              width: '100%', maxWidth: '400px', position: 'relative', overflow: 'hidden',
+              boxShadow: '0 40px 100px rgba(0,0,0,0.6)', animation: 'slide-in 0.4s cubic-bezier(0.1, 1, 0.3, 1)', padding: '30px 25px'
+            }}>
+              <div style={{ height: '5px', width: '100%', position: 'absolute', top: 0, left: 0, background: 'var(--accent-gradient)' }}></div>
 
-            <div className="relative z-10">
-              <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-blue-500/20 transform -rotate-6">
-                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div style={{
+                width: '60px', height: '60px', background: 'var(--accent-gradient)', borderRadius: '18px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 15px',
+                boxShadow: '0 8px 16px rgba(56, 189, 248, 0.2)'
+              }}>
+                <svg style={{ width: '28px', height: '28px', color: 'white' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                 </svg>
               </div>
 
-              <h2 className="text-3xl font-black text-white mb-4 tracking-tight">
-                Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Exam Cracker</span>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'white', marginBottom: '8px', textAlign: 'center' }}>
+                Welcome back, Warrior! 🎯
               </h2>
 
-              <p className="text-gray-400 text-lg mb-10 leading-relaxed font-medium">
-                Hello {user?.name}, we're excited to help you achieve your goals today! Your dashboard is now updated with the latest classes and materials.
+              <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.5', marginBottom: '25px', textAlign: 'center' }}>
+                Happy to see you again! Your coaching dashboard is ready. Let's start preparing for your success.
               </p>
 
               <button
                 onClick={() => setShowWelcome(false)}
-                className="w-full bg-white text-black font-bold py-5 rounded-2xl hover:bg-gray-200 transition-all transform active:scale-95 shadow-xl text-lg tracking-wide"
+                style={{
+                  width: '100%', background: 'white', color: 'black', fontWeight: '700', padding: '16px',
+                  borderRadius: '16px', border: 'none', cursor: 'pointer', transition: '0.2s', fontSize: '1rem'
+                }}
+                onMouseEnter={(e) => e.target.style.background = '#e2e8f0'}
+                onMouseLeave={(e) => e.target.style.background = 'white'}
               >
-                Go to Dashboard
+                Enter Dashboard
               </button>
 
-              <div className="mt-8 flex items-center justify-center space-x-2 text-gray-500 font-bold text-xs uppercase tracking-[0.2em]">
-                <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
-                <span>Exam Cracker Coaching Centre</span>
-                <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
+              <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '10px', fontWeight: '700', letterSpacing: '0.1em', color: '#64748b' }}>
+                EXAM CRACKER COACHING CENTRE
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
+      {/* Professional Auth Modal */}
+      {
+        showAuthModal && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 12000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.9)', backdropFilter: 'blur(15px)' }} onClick={() => setShowAuthModal(false)}></div>
+            <div className="panel" style={{ position: 'relative', width: '100%', maxWidth: '440px', padding: '3rem', boxShadow: '0 60px 120px rgba(0,0,0,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '32px', background: 'var(--bg-primary)', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '6px', background: 'var(--accent-gradient)' }}></div>
+              <button onClick={() => setShowAuthModal(false)} style={{ position: 'absolute', top: '24px', right: '24px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', color: 'var(--text-secondary)', cursor: 'pointer', padding: '8px', borderRadius: '12px', transition: '0.2s' }}>
+                <svg style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+
+              <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+                <div style={{ width: '72px', height: '72px', background: 'var(--accent-gradient)', borderRadius: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 15px 30px rgba(14, 165, 233, 0.2)' }}>
+                  <svg style={{ width: '36px', height: '36px', color: 'white' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A10.003 10.003 0 0012 3a10.003 10.003 0 00-6.918 2.720m.051 10.24A10.003 10.003 0 0012 21a10.003 10.003 0 006.918-2.720M3 11a10.003 10.003 0 0110.24-6.918M21 11a10.003 10.003 0 00-10.24-6.918" /></svg>
+                </div>
+                <h2 style={{ fontSize: '2rem', fontWeight: '900', color: 'white', letterSpacing: '-0.02em' }}>{isLoginView ? 'Welcome' : 'Join Us'}</h2>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginTop: '8px' }}>The official gateway to Exam Cracker</p>
+              </div>
+
+              {authError && <div style={{ color: '#ef4444', marginBottom: '1.5rem', textAlign: 'center', fontSize: '0.9rem', background: 'rgba(239, 68, 68, 0.08)', padding: '1rem', borderRadius: '14px', border: '1px solid rgba(239, 68, 68, 0.15)' }}>{authError}</div>}
+
+              <form onSubmit={async (e) => { e.preventDefault(); await handleAuth(e); if (!authError) setShowAuthModal(false); }} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                {!isLoginView && (
+                  <div style={{ position: 'relative' }}>
+                    <input style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '16px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white', outline: 'none', transition: '0.2s' }} placeholder="Your Full Name" value={authForm.name} onChange={e => setAuthForm({ ...authForm, name: e.target.value })} required />
+                  </div>
+                )}
+                <div>
+                  <input type="email" style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '16px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white', outline: 'none', transition: '0.2s' }} placeholder="Email address" value={authForm.email} onChange={e => setAuthForm({ ...authForm, email: e.target.value })} required />
+                </div>
+                <div>
+                  <input type="password" style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '16px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white', outline: 'none', transition: '0.2s' }} placeholder="Password" value={authForm.password} onChange={e => setAuthForm({ ...authForm, password: e.target.value })} required />
+                </div>
+                <button type="submit" className="btn btn-primary" style={{ padding: '1.1rem', borderRadius: '16px', fontWeight: '800', fontSize: '1.1rem', marginTop: '0.5rem' }} disabled={loading}>
+                  {loading ? 'Authenticating...' : (isLoginView ? 'Sign In' : 'Create Profile')}
+                </button>
+              </form>
+
+              <div style={{ marginTop: '2.5rem', textAlign: 'center', borderTop: '1px solid var(--border-glass)', paddingTop: '1.5rem' }}>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+                  {isLoginView ? "Don't have an account?" : "Already a student?"}
+                  <span style={{ color: 'var(--accent-primary)', cursor: 'pointer', fontWeight: '800', marginLeft: '6px' }} onClick={() => setIsLoginView(!isLoginView)}>
+                    {isLoginView ? "Join for free" : "Log in here"}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        )
+      }
     </>
   )
 }
