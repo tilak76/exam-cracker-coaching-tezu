@@ -73,6 +73,14 @@ function App() {
   const [loadingAttendance, setLoadingAttendance] = useState(false);
   const [toast, setToast] = useState({ message: '', type: 'success', visible: false });
   const [confirmDialog, setConfirmDialog] = useState({ visible: false, title: '', message: '', onConfirm: null });
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    if (user && !sessionStorage.getItem('welcomeShown')) {
+      setShowWelcome(true);
+      sessionStorage.setItem('welcomeShown', 'true');
+    }
+  }, [user]);
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type, visible: true });
@@ -1174,6 +1182,47 @@ function App() {
               >
                 Delete
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Welcome Popup */}
+      {showWelcome && (
+        <div className="fixed inset-0 z-[11000] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xl animate-fade-in" onClick={() => setShowWelcome(false)}></div>
+          <div className="relative bg-[#1a1c1e] border border-white/10 rounded-[32px] p-10 max-w-lg w-full shadow-[0_50px_100px_rgba(0,0,0,0.5)] transform transition-all scale-100 animate-slide-in text-center overflow-hidden">
+            {/* Background Glow */}
+            <div className="absolute -top-24 -left-24 w-48 h-48 bg-blue-500/20 blur-[100px]"></div>
+            <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-indigo-500/20 blur-[100px]"></div>
+            
+            <div className="relative z-10">
+              <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-blue-500/20 transform -rotate-6">
+                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+              </div>
+
+              <h2 className="text-3xl font-black text-white mb-4 tracking-tight">
+                Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Exam Cracker</span>
+              </h2>
+              
+              <p className="text-gray-400 text-lg mb-10 leading-relaxed font-medium">
+                Hello {user?.name}, we're excited to help you achieve your goals today! Your dashboard is now updated with the latest classes and materials.
+              </p>
+
+              <button 
+                onClick={() => setShowWelcome(false)}
+                className="w-full bg-white text-black font-bold py-5 rounded-2xl hover:bg-gray-200 transition-all transform active:scale-95 shadow-xl text-lg tracking-wide"
+              >
+                Go to Dashboard
+              </button>
+
+              <div className="mt-8 flex items-center justify-center space-x-2 text-gray-500 font-bold text-xs uppercase tracking-[0.2em]">
+                <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
+                <span>Exam Cracker Coaching Centre</span>
+                <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
+              </div>
             </div>
           </div>
         </div>
