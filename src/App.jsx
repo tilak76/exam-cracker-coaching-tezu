@@ -209,11 +209,22 @@ function App() {
         const cred = await createUserWithEmailAndPassword(firebaseAuth, authForm.email, authForm.password);
         await updateProfile(cred.user, { displayName: authForm.name });
         const role = authForm.email === 'tilakmishra.76@gmail.com' ? 'admin' : 'student';
-        const uData = { name: authForm.name, email: authForm.email, role, isApproved: true, createdAt: new Date().toISOString() };
+        const uData = { name: authForm.name, email: authForm.email, role, isApproved: role === 'admin', createdAt: new Date().toISOString() };
         await setDoc(doc(firestoreDb, 'users', cred.user.uid), uData);
         showToast('Registration Successful! Welcome to Exam Cracker.', 'success');
       }
-    } catch (err) { setAuthError(err.message); }
+    } catch (err) {
+      let msg = err.message;
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+        msg = "❌ Email या Password गलत है! अगर आपने नया अकाउंट नहीं बनाया है तो पहले 'Sign Up' करें।";
+      } else if (err.code === 'auth/email-already-in-use') {
+        msg = "❌ यह Email पहले से इस्तेमाल में है। कृपया 'Log In' करें।";
+      } else if (err.code === 'auth/weak-password') {
+        msg = "❌ पासवर्ड कम से कम 6 अक्षरों का होना चाहिए।";
+      }
+      setAuthError(msg);
+      showToast(msg, 'error');
+    }
     setLoading(false);
   }
 
@@ -447,7 +458,7 @@ function App() {
 
         <nav className="nav-menu">
           {navItems.map((item) => {
-            const isLocked = false; // All features unlocked for everyone
+            const isLocked = user?.role === 'student' && !user?.isApproved && item.name !== 'Dashboard';
             return (
               <div
                 key={item.name}
@@ -490,7 +501,7 @@ function App() {
         </header>
 
         <section className="content-area">
-          {false ? ( // Disable the verification screen
+          {user?.role === 'student' && !user?.isApproved ? (
             <div className="panel" style={{ textAlign: 'center', padding: '5rem 2rem', margin: '2rem auto', maxWidth: '700px', borderRadius: '24px', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '8px', background: 'linear-gradient(90deg, #f59e0b, #fbbf24)' }}></div>
               <div style={{ background: 'rgba(245, 158, 11, 0.1)', width: '100px', height: '100px', borderRadius: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2.5rem', color: '#f59e0b', transform: 'rotate(10deg)' }}>
