@@ -39,7 +39,7 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 });
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI).then(() => {
+mongoose.connect(process.env.MONGODB_URI || "mongodb://127.0.0.1:27010/examcracker").then(() => {
     console.log('Connected to MongoDB successfully');
 }).catch(err => {
     console.error('Error connecting to MongoDB:', err);
