@@ -5,7 +5,8 @@ import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
-  updateProfile
+  updateProfile,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import {
@@ -219,6 +220,22 @@ function App() {
     setLoading(false);
   }
 
+  const handleResetPassword = async () => {
+    if (!authForm.email) {
+      showToast("Please enter your email address first!", "error");
+      return;
+    }
+    setLoading(true);
+    try {
+      await sendPasswordResetEmail(firebaseAuth, authForm.email);
+      showToast("Password reset link sent to your email!", "success");
+    } catch (err) {
+      setAuthError(err.message);
+      showToast(err.message, "error");
+    }
+    setLoading(false);
+  }
+
   const logout = () => signOut(firebaseAuth);
 
   const uploadFile = async (file) => {
@@ -408,8 +425,13 @@ function App() {
             )}
             <input type="email" style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white' }} placeholder="Email Address" value={authForm.email} onChange={e => setAuthForm({ ...authForm, email: e.target.value })} required />
             <input type="password" style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white' }} placeholder="Password" value={authForm.password} onChange={e => setAuthForm({ ...authForm, password: e.target.value })} required />
-            <button type="submit" className="btn btn-primary">{isLoginView ? 'Log In' : 'Sign Up'}</button>
+            <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? 'Processing...' : (isLoginView ? 'Log In' : 'Sign Up')}</button>
           </form>
+          {isLoginView && (
+            <p style={{ textAlign: 'center', marginTop: '1rem', color: '#3b82f6', fontSize: '0.875rem', cursor: 'pointer', fontWeight: '500' }} onClick={handleResetPassword}>
+              Forgot Password?
+            </p>
+          )}
           <p style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--text-secondary)', cursor: 'pointer' }} onClick={() => setIsLoginView(!isLoginView)}>
             {isLoginView ? "Don't have an account? Sign Up" : "Already have an account? Log In"}
           </p>
