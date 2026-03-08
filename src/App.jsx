@@ -8,47 +8,69 @@ import {
   updateProfile
 } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import {
+  collection,
+  addDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  orderBy,
+  setDoc,
+  getDoc,
+  updateDoc,
+  where,
+  limit,
+  getDocs
+} from 'firebase/firestore';
 import './index.css';
 
 function App() {
   const [activeTab, setActiveTab] = useState('Dashboard');
-  const [token, setToken] = useState(localStorage.getItem('token'));
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user') || 'null'));
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState('');
   const [isLoginView, setIsLoginView] = useState(true);
   const [authForm, setAuthForm] = useState({ name: '', email: '', password: '' });
 
-  const [stats, setStats] = useState([])
-  const [newClass, setNewClass] = useState({ subject: '', batch: '', time: '', status: 'Scheduled' })
-  const [submitting, setSubmitting] = useState(false)
-  const [classes, setClasses] = useState([])
-  const [recentActivities, setRecentActivities] = useState([])
+  const [stats, setStats] = useState([
+    { title: 'Total Students', value: '0', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197' },
+    { title: 'Live Classes', value: '0', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2' },
+    { title: 'Tests Done', value: '0', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
+    { title: 'Study Hours', value: '0h', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' }
+  ]);
 
-  const [notes, setNotes] = useState([])
-  const [newNote, setNewNote] = useState({ title: '', subject: '', link: '' })
-  const [noteFile, setNoteFile] = useState(null)
+  const [classes, setClasses] = useState([]);
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [notes, setNotes] = useState([]);
+  const [assignments, setAssignments] = useState([]);
+  const [tests, setTests] = useState([]);
+  const [completedTests, setCompletedTests] = useState([]);
+  const [studentsList, setStudentsList] = useState([]);
 
-  const [assignments, setAssignments] = useState([])
-  const [newAssignment, setNewAssignment] = useState({ title: '', subject: '', deadline: '' })
-  const [assignmentFile, setAssignmentFile] = useState(null)
+  const [newClass, setNewClass] = useState({ subject: '', batch: '', time: '', status: 'Scheduled' });
+  const [newNote, setNewNote] = useState({ title: '', subject: '', link: '' });
+  const [newAssignment, setNewAssignment] = useState({ title: '', subject: '', deadline: '' });
+  const [newTest, setNewTest] = useState({ title: '', subject: '', durationMinutes: 60, negativeMark: 0.25, instructions: '1. All questions are compulsory.\n2. Negative marking is applicable.', questionsCount: 10, answerKey: Array(10).fill(0) });
 
-  const [tests, setTests] = useState([])
+  const [noteFile, setNoteFile] = useState(null);
+  const [assignmentFile, setAssignmentFile] = useState(null);
+  const [testFile, setTestFile] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('');
 
-  const [testFilter, setTestFilter] = useState('All');
-  const [completedTests, setCompletedTests] = useState([]);
-  const [leaderboard, setLeaderboard] = useState([]);
-
-  const [loading, setLoading] = useState(true);
   const [activeTest, setActiveTest] = useState(null);
   const [testMode, setTestMode] = useState('instructions');
   const [timer, setTimer] = useState(0);
   const [answers, setAnswers] = useState({});
   const [testResult, setTestResult] = useState(null);
-  const [newTest, setNewTest] = useState({ title: '', subject: '', durationMinutes: 60, negativeMark: 0.25, instructions: '1. All questions are compulsory.\n2. Negative marking is applicable.', questionsCount: 10, answerKey: Array(10).fill(0) });
-  const [testFile, setTestFile] = useState(null);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [testFilter, setTestFilter] = useState('All');
+
+  const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split('T')[0]);
+  const [attendanceRecords, setAttendanceRecords] = useState({});
+  const [loadingAttendance, setLoadingAttendance] = useState(false);
 
   const navItems = [
     { name: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -58,51 +80,7 @@ function App() {
     { name: 'Tests', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' }
   ];
 
-  const [studentsList, setStudentsList] = useState([]);
-  const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split('T')[0]);
-  const [attendanceRecords, setAttendanceRecords] = useState({});
-  const [loadingAttendance, setLoadingAttendance] = useState(false);
-
-  // Dynamically set backend URL so it works on mobile IP too
-  // Dynamically set backend URL: Use relative path in production, and full URL in local dev
-  const VITE_API_URL = (window.location.port === '5173' || window.location.port === '3000')
-    ? `http://${window.location.hostname}:5000/api`
-    : '/api';
-
-  useEffect(() => {
-    let interval = null;
-    if (activeTest && timer > 0) {
-      interval = setInterval(() => setTimer(prev => prev - 1), 1000);
-    } else if (timer === 0 && activeTest && testMode === 'running') {
-      alert("Test time is up! Auto-submitting...");
-      submitTest();
-    }
-    return () => clearInterval(interval);
-  }, [activeTest, timer, testMode]);
-
-  useEffect(() => {
-    if (!token) return;
-    Promise.all([
-      fetch(`${VITE_API_URL}/dashboard`).then(res => res.json()),
-      fetch(`${VITE_API_URL}/notes`).then(res => res.json()),
-      fetch(`${VITE_API_URL}/assignments`).then(res => res.json()),
-      fetch(`${VITE_API_URL}/tests`).then(res => res.json()),
-      user?.email ? fetch(`${VITE_API_URL}/user-tests/${user.email}`).then(res => res.json()) : Promise.resolve([])
-    ]).then(([dashData, notesData, assignData, testsData, completedData]) => {
-      if (dashData.stats) setStats(dashData.stats);
-      if (dashData.classes) setClasses(dashData.classes);
-      if (dashData.activities) setRecentActivities(dashData.activities);
-      if (Array.isArray(notesData)) setNotes(notesData);
-      if (Array.isArray(assignData)) setAssignments(assignData);
-      if (Array.isArray(testsData)) setTests(testsData);
-      if (Array.isArray(completedData)) setCompletedTests(completedData);
-      setLoading(false);
-    }).catch(err => {
-      console.error("Error fetching data:", err);
-      setLoading(false);
-    });
-  }, [token]);
-
+  // Auth Observer
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(firebaseAuth, async (fbUser) => {
       if (fbUser) {
@@ -112,9 +90,8 @@ function App() {
           setUser({ ...userData, id: fbUser.uid });
           setToken(await fbUser.getIdToken());
         } catch (err) {
-          console.error("Firestore access error:", err);
+          console.error("Auth sync error:", err);
           setUser({ name: fbUser.displayName, email: fbUser.email, role: 'student', isApproved: false, id: fbUser.uid });
-          setToken(await fbUser.getIdToken());
         }
       } else {
         setUser(null);
@@ -125,306 +102,209 @@ function App() {
     return () => unsubscribe();
   }, []);
 
+  // Real-time Data Listeners
+  useEffect(() => {
+    if (!user) return;
+
+    const unsubClasses = onSnapshot(collection(firestoreDb, 'classes'), (snap) => {
+      setClasses(snap.docs.map(doc => ({ ...doc.data(), _id: doc.id })));
+    });
+
+    const unsubNotes = onSnapshot(query(collection(firestoreDb, 'notes'), orderBy('createdAt', 'desc')), (snap) => {
+      setNotes(snap.docs.map(doc => ({ ...doc.data(), _id: doc.id })));
+    });
+
+    const unsubAssign = onSnapshot(query(collection(firestoreDb, 'assignments'), orderBy('createdAt', 'desc')), (snap) => {
+      setAssignments(snap.docs.map(doc => ({ ...doc.data(), _id: doc.id })));
+    });
+
+    const unsubTests = onSnapshot(query(collection(firestoreDb, 'tests'), orderBy('createdAt', 'desc')), (snap) => {
+      setTests(snap.docs.map(doc => ({ ...doc.data(), _id: doc.id })));
+    });
+
+    const unsubActivities = onSnapshot(query(collection(firestoreDb, 'activities'), orderBy('createdAt', 'desc'), limit(15)), (snap) => {
+      setRecentActivities(snap.docs.map(doc => ({ ...doc.data(), _id: doc.id })));
+    });
+
+    if (user?.email) {
+      const unsubResults = onSnapshot(query(collection(firestoreDb, 'testResults'), where('userEmail', '==', user.email)), (snap) => {
+        setCompletedTests(snap.docs.map(doc => doc.data().testId));
+      });
+      return () => { unsubClasses(); unsubNotes(); unsubAssign(); unsubTests(); unsubActivities(); unsubResults(); };
+    }
+
+    return () => { unsubClasses(); unsubNotes(); unsubAssign(); unsubTests(); unsubActivities(); };
+  }, [user]);
+
+  // Global Stats derived from Firestore
+  useEffect(() => {
+    if (!user) return;
+    const unsubUsers = onSnapshot(collection(firestoreDb, 'users'), (snap) => {
+      const studentCount = snap.docs.filter(d => d.data().role === 'student').length;
+      setStats(prev => {
+        const s = [...prev];
+        s[0].value = studentCount.toString();
+        return s;
+      });
+    });
+    return () => unsubUsers();
+  }, [user]);
+
   const handleAuth = async (e) => {
     e.preventDefault();
     setAuthError('');
     setLoading(true);
     try {
       if (isLoginView) {
-        // Sign In
-        const userCredential = await signInWithEmailAndPassword(firebaseAuth, authForm.email, authForm.password);
-        // Check approval if not admin
-        const userDoc = await getDoc(doc(firestoreDb, 'users', userCredential.user.uid));
-        if (userDoc.exists() && !userDoc.data().isApproved && userDoc.data().role !== 'admin') {
+        const cred = await signInWithEmailAndPassword(firebaseAuth, authForm.email, authForm.password);
+        const uDoc = await getDoc(doc(firestoreDb, 'users', cred.user.uid));
+        if (uDoc.exists() && !uDoc.data().isApproved && uDoc.data().role !== 'admin') {
           await signOut(firebaseAuth);
-          throw new Error('Your account is pending Admin approval.');
+          throw new Error('Pending Admin Approval.');
         }
       } else {
-        // Sign Up
-        const userCredential = await createUserWithEmailAndPassword(firebaseAuth, authForm.email, authForm.password);
-        await updateProfile(userCredential.user, { displayName: authForm.name });
-
+        const cred = await createUserWithEmailAndPassword(firebaseAuth, authForm.email, authForm.password);
+        await updateProfile(cred.user, { displayName: authForm.name });
         const role = authForm.email === 'tilakmishra.76@gmail.com' ? 'admin' : 'student';
-        const userData = {
-          name: authForm.name,
-          email: authForm.email,
-          role: role,
-          isApproved: role === 'admin',
-          createdAt: new Date().toISOString()
-        };
-
-        await setDoc(doc(firestoreDb, 'users', userCredential.user.uid), userData);
+        const uData = { name: authForm.name, email: authForm.email, role, isApproved: role === 'admin', createdAt: new Date().toISOString() };
+        await setDoc(doc(firestoreDb, 'users', cred.user.uid), uData);
         if (role !== 'admin') {
           await signOut(firebaseAuth);
-          setAuthError('Registration successful! Please wait for Admin approval to login.');
-          setLoading(false);
-          return;
+          alert('Registered! Wait for Admin approval.');
         }
       }
-    } catch (err) {
-      let msg = err.message;
-      if (err.code === 'auth/user-not-found') msg = "User not found";
-      if (err.code === 'auth/wrong-password') msg = "Incorrect password";
-      setAuthError(msg);
-    }
+    } catch (err) { setAuthError(err.message); }
     setLoading(false);
   }
 
-  const logout = () => {
-    signOut(firebaseAuth);
-  }
+  const logout = () => signOut(firebaseAuth);
 
   const uploadFile = async (file) => {
     const storageRef = ref(firebaseStorage, `uploads/${Date.now()}-${file.name}`);
-    const snapshot = await uploadBytes(storageRef, file);
-    const downloadURL = await getDownloadURL(snapshot.ref);
-    return downloadURL;
+    const snap = await uploadBytes(storageRef, file);
+    return await getDownloadURL(snap.ref);
   };
 
   const handleAddClass = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    setUploadStatus('Scheduling...');
     try {
-      const res = await fetch(`${VITE_API_URL}/classes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newClass)
-      });
-      const data = await res.json();
-      setClasses([...classes, data]);
+      await addDoc(collection(firestoreDb, 'classes'), { ...newClass, createdAt: new Date().toISOString() });
+      await addDoc(collection(firestoreDb, 'activities'), { title: 'Class Added', text: newClass.subject, icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2', createdAt: new Date().toISOString() });
       setNewClass({ subject: '', batch: '', time: '', status: 'Scheduled' });
-      setUploadStatus('Class added successfully!');
-      setTimeout(() => setUploadStatus(''), 3000);
-    } catch (err) { console.error(err); setUploadStatus('Error adding class.'); }
+      setUploadStatus('Done!'); setTimeout(() => setUploadStatus(''), 2000);
+    } catch (e) { console.error(e); }
     setSubmitting(false);
   }
 
   const handleDeleteClass = async (id) => {
-    if (!window.confirm("Delete this class?")) return;
-    try {
-      await fetch(`${VITE_API_URL}/classes/${id}`, { method: 'DELETE' });
-      setClasses(classes.filter(c => c._id !== id));
-    } catch (err) { console.error(err) }
+    if (window.confirm("Delete?")) await deleteDoc(doc(firestoreDb, 'classes', id));
   }
 
   const handleAddNote = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    setUploadStatus('Uploading File...');
     try {
-      let downloadURL = newNote.link || "";
-      if (noteFile) {
-        downloadURL = await uploadFile(noteFile);
-      }
-      const noteData = { ...newNote, link: downloadURL };
-      const res = await fetch(`${VITE_API_URL}/notes`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(noteData) });
-      const data = await res.json();
-      setNotes([...notes, data]);
-      setNewNote({ title: '', subject: '', link: '' });
-      setNoteFile(null);
-      setUploadStatus('Note uploaded successfully!');
-      setTimeout(() => setUploadStatus(''), 3000);
-    } catch (err) {
-      console.error(err);
-      setUploadStatus('Error uploading Note.');
-    }
+      const url = noteFile ? await uploadFile(noteFile) : newNote.link;
+      await addDoc(collection(firestoreDb, 'notes'), { ...newNote, link: url, createdAt: new Date().toISOString() });
+      setNewNote({ title: '', subject: '', link: '' }); setNoteFile(null);
+      setUploadStatus('Uploaded!'); setTimeout(() => setUploadStatus(''), 2000);
+    } catch (e) { console.error(e); }
     setSubmitting(false);
   }
 
-  const handleDeleteNote = async (id) => {
-    try {
-      await fetch(`${VITE_API_URL}/notes/${id}`, { method: 'DELETE' });
-      setNotes(notes.filter(n => n._id !== id));
-    } catch (err) { }
-  }
+  const handleDeleteNote = async (id) => { await deleteDoc(doc(firestoreDb, 'notes', id)); }
 
   const handleAddAssignment = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    setUploadStatus('Uploading Assignment...');
     try {
-      let downloadURL = newAssignment.fileUrl || "";
-      if (assignmentFile) {
-        downloadURL = await uploadFile(assignmentFile);
-      }
-      const assignData = { ...newAssignment, fileUrl: downloadURL };
-      const res = await fetch(`${VITE_API_URL}/assignments`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(assignData) });
-      const data = await res.json();
-      setAssignments([...assignments, data]);
-      setNewAssignment({ title: '', subject: '', deadline: '' });
-      setAssignmentFile(null);
-      setUploadStatus('Assignment uploaded successfully!');
-      setTimeout(() => setUploadStatus(''), 3000);
-    } catch (err) {
-      console.error(err);
-      setUploadStatus('Error uploading Assignment.');
-    }
+      const url = assignmentFile ? await uploadFile(assignmentFile) : newAssignment.fileUrl;
+      await addDoc(collection(firestoreDb, 'assignments'), { ...newAssignment, fileUrl: url, createdAt: new Date().toISOString() });
+      setNewAssignment({ title: '', subject: '', deadline: '' }); setAssignmentFile(null);
+      setUploadStatus('Assignment added!'); setTimeout(() => setUploadStatus(''), 2000);
+    } catch (e) { console.error(e); }
     setSubmitting(false);
   }
 
-  const handleDeleteAssignment = async (id) => {
-    try {
-      await fetch(`${VITE_API_URL}/assignments/${id}`, { method: 'DELETE' });
-      setAssignments(assignments.filter(a => a._id !== id));
-    } catch (err) { }
-  }
+  const handleDeleteAssignment = async (id) => { await deleteDoc(doc(firestoreDb, 'assignments', id)); }
 
   const handleAddTest = async (e) => {
     e.preventDefault();
+    if (!testFile) return alert("Select PDF");
     setSubmitting(true);
-    setUploadStatus('Creating Test...');
     try {
-      let downloadURL = "";
-      if (testFile) {
-        downloadURL = await uploadFile(testFile);
-      } else {
-        return alert("Please upload a Test PDF!");
-      }
-      const finalTest = { ...newTest, fileUrl: downloadURL };
-      const res = await fetch(`${VITE_API_URL}/tests`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(finalTest) });
-      const data = await res.json();
-      setTests([...tests, data]);
-      setNewTest({ title: '', subject: '', durationMinutes: 60, negativeMark: 0.25, instructions: '1. All questions are compulsory.\n2. Negative marking is applicable.', questionsCount: 10, answerKey: Array(10).fill(0) });
-      setTestFile(null);
-      setUploadStatus('Test created successfully!');
-      setTimeout(() => setUploadStatus(''), 3000);
-    } catch (err) {
-      console.error(err);
-      setUploadStatus('Error creating test.');
-    }
+      const url = await uploadFile(testFile);
+      await addDoc(collection(firestoreDb, 'tests'), { ...newTest, fileUrl: url, createdAt: new Date().toISOString() });
+      setNewTest({ title: '', subject: '', durationMinutes: 60, negativeMark: 0.25, instructions: 'Standard Test Instructions', questionsCount: 10, answerKey: Array(10).fill(0) });
+      setTestFile(null); setUploadStatus('Test created!'); setTimeout(() => setUploadStatus(''), 2000);
+    } catch (e) { console.error(e); }
     setSubmitting(false);
   }
 
   const handleDeleteTest = async (id) => {
-    if (!window.confirm("Delete this test?")) return;
-    try {
-      await fetch(`${VITE_API_URL}/tests/${id}`, { method: 'DELETE' });
-      setTests(tests.filter(t => t._id !== id));
-    } catch (err) { console.error(err) }
+    if (window.confirm("Delete?")) await deleteDoc(doc(firestoreDb, 'tests', id));
   }
 
   const startTest = (test) => {
-    setActiveTest(test);
-    setTestMode('instructions');
-    setAnswers({});
-    setTimer(test.durationMinutes * 60);
-  }
-
-  const beginRunningTest = () => {
-    setTestMode('running');
-    setTimer(activeTest.durationMinutes * 60);
+    setActiveTest(test); setTestMode('instructions'); setAnswers({}); setTimer(test.durationMinutes * 60);
   }
 
   const submitTest = async () => {
-    let score = 0;
-    let correct = 0;
-    let wrong = 0;
-    let skipped = 0;
-
-    activeTest.answerKey.forEach((correctOpt, i) => {
-      if (answers[i] === undefined) {
-        skipped++;
-      } else if (answers[i] === correctOpt) {
-        score += 4;
-        correct++;
-      } else {
-        score -= (activeTest.negativeMark || 0);
-        wrong++;
-      }
+    let score = 0, correct = 0, wrong = 0, skipped = 0;
+    activeTest.answerKey.forEach((k, i) => {
+      if (answers[i] === undefined) skipped++;
+      else if (answers[i] === k) { score += 4; correct++; }
+      else { score -= (activeTest.negativeMark || 0); wrong++; }
     });
-
     setTestResult({ score, correct, wrong, total: activeTest.questionsCount });
     setTestMode('result');
-
-    const isPractice = completedTests.includes(activeTest._id.toString());
-
-    fetch(`${VITE_API_URL}/test-results`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        testId: activeTest._id,
-        userName: user?.name || 'Guest',
-        userEmail: user?.email || '',
-        score, correct, wrong, skipped,
-        total: activeTest.questionsCount,
-        isPractice
-      })
-    }).then(res => res.json()).then(data => {
-      if (!data.isPractice && !completedTests.includes(activeTest._id.toString())) {
-        setCompletedTests([...completedTests, activeTest._id.toString()]);
-      }
-    }).catch(console.error);
+    const isPractice = completedTests.includes(activeTest._id);
+    await addDoc(collection(firestoreDb, 'testResults'), {
+      testId: activeTest._id, userName: user.name, userEmail: user.email,
+      score, correct, wrong, skipped, total: activeTest.questionsCount,
+      isPractice, createdAt: new Date().toISOString()
+    });
   }
 
   const handleViewLeaderboard = async (t) => {
-    setActiveTest(t);
-    setTestMode('leaderboard');
-    try {
-      const res = await fetch(`${VITE_API_URL}/test-results/${t._id}`);
-      const data = await res.json();
-      setLeaderboard(data);
-    } catch (e) { console.error(e) }
+    setActiveTest(t); setTestMode('leaderboard');
+    const q = query(collection(firestoreDb, 'testResults'), where('testId', '==', t._id), orderBy('score', 'desc'));
+    const snap = await getDocs(q);
+    setLeaderboard(snap.docs.map(d => d.data()));
   }
 
   const loadAttendance = async (date) => {
     setLoadingAttendance(true);
-    try {
-      const res = await fetch(`${VITE_API_URL}/attendance?date=${date}`);
-      const data = await res.json();
-      const records = {};
-      if (data.records) {
-        data.records.forEach(r => records[r.studentId] = r.status);
-      }
-      setAttendanceRecords(records);
-    } catch (e) { console.error(e) }
+    const d = await getDoc(doc(firestoreDb, 'attendance', date));
+    if (d.exists()) {
+      const r = {}; d.data().records.forEach(v => r[v.studentId] = v.status);
+      setAttendanceRecords(r);
+    } else setAttendanceRecords({});
     setLoadingAttendance(false);
   }
 
   const saveAttendance = async () => {
     setSubmitting(true);
-    const recordsToSave = studentsList.map(s => ({
-      studentId: s._id,
-      name: s.name,
-      email: s.email,
-      status: attendanceRecords[s._id] || 'Present'
-    }));
-    try {
-      await fetch(`${VITE_API_URL}/attendance`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: attendanceDate, records: recordsToSave })
-      });
-      alert('Attendance Saved!');
-    } catch (e) { console.error(e) }
-    setSubmitting(false);
+    const final = studentsList.map(s => ({ studentId: s._id, name: s.name, email: s.email, status: attendanceRecords[s._id] || 'Present' }));
+    await setDoc(doc(firestoreDb, 'attendance', attendanceDate), { date: attendanceDate, records: final });
+    alert("Saved!"); setSubmitting(false);
   }
 
   useEffect(() => {
     if ((activeTab === 'Attendance' || activeTab === 'Students') && user?.role === 'admin') {
-      fetch(`${VITE_API_URL}/students`).then(res => res.json()).then(data => {
-        setStudentsList(data);
-        if (activeTab === 'Attendance') {
-          loadAttendance(attendanceDate);
-        }
-      }).catch(console.error);
+      const unsub = onSnapshot(collection(firestoreDb, 'users'), (snap) => {
+        setStudentsList(snap.docs.map(d => ({ ...d.data(), _id: d.id })).filter(u => u.role === 'student'));
+        if (activeTab === 'Attendance') loadAttendance(attendanceDate);
+      });
+      return () => unsub();
     }
   }, [activeTab, attendanceDate, user]);
 
-  const handleApproveStudent = async (id) => {
-    try {
-      await fetch(`${VITE_API_URL}/students/${id}/approve`, { method: 'PUT' });
-      setStudentsList(studentsList.map(s => s._id === id ? { ...s, isApproved: true } : s));
-    } catch (e) { console.error(e) }
-  }
+  const handleApproveStudent = async (id) => { await updateDoc(doc(firestoreDb, 'users', id), { isApproved: true }); }
+  const handleDeleteStudent = async (id) => { if (window.confirm("Delete?")) await deleteDoc(doc(firestoreDb, 'users', id)); }
 
-  const handleDeleteStudent = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this student completely?')) return;
-    try {
-      await fetch(`${VITE_API_URL}/students/${id}`, { method: 'DELETE' });
-      setStudentsList(studentsList.filter(s => s._id !== id));
-    } catch (e) { console.error(e) }
-  }
+  const beginRunningTest = () => { setTestMode('running'); setTimer(activeTest.durationMinutes * 60); }
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
