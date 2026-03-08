@@ -12,14 +12,10 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from the React app build folder
-app.use(express.static(path.join(__dirname, '../dist')));
-
 const multer = require('multer');
 const path = require('path');
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use(express.static(path.join(__dirname, '../dist'))); // Serve React frontend
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -413,13 +409,12 @@ app.post('/api/attendance', async (req, res) => {
     }
 });
 
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-app.get('*', (req, res) => {
-    const path = require('path');
-    res.sendFile(path.join(__dirname, '../dist/index.html'));
-});
+// Conditionally start the server if NOT running on Vercel
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT}`);
-});
+// Export the app for Vercel
+module.exports = app;
