@@ -71,6 +71,17 @@ function App() {
   const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split('T')[0]);
   const [attendanceRecords, setAttendanceRecords] = useState({});
   const [loadingAttendance, setLoadingAttendance] = useState(false);
+  const [toast, setToast] = useState({ message: '', type: 'success', visible: false });
+  const [confirmDialog, setConfirmDialog] = useState({ visible: false, title: '', message: '', onConfirm: null });
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type, visible: true });
+    setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 4000);
+  };
+
+  const askConfirm = (title, message, onConfirm) => {
+    setConfirmDialog({ visible: true, title, message, onConfirm });
+  };
 
   const navItems = [
     { name: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -136,6 +147,18 @@ function App() {
     return () => { unsubClasses(); unsubNotes(); unsubAssign(); unsubTests(); unsubActivities(); };
   }, [user]);
 
+  // Test Timer Logic
+  useEffect(() => {
+    let interval = null;
+    if (activeTest && timer > 0 && testMode === 'running') {
+      interval = setInterval(() => setTimer(prev => prev - 1), 1000);
+    } else if (timer === 0 && activeTest && testMode === 'running') {
+      showToast("Time is up! Your test is being submitted automatically.", "warning");
+      submitTest();
+    }
+    return () => clearInterval(interval);
+  }, [activeTest, timer, testMode]);
+
   // Global Stats derived from Firestore
   useEffect(() => {
     if (!user) return;
@@ -170,7 +193,7 @@ function App() {
         await setDoc(doc(firestoreDb, 'users', cred.user.uid), uData);
         if (role !== 'admin') {
           await signOut(firebaseAuth);
-          alert('Registered! Wait for Admin approval.');
+          showToast('Registered! Please wait for Admin approval.', 'info');
         }
       }
     } catch (err) { setAuthError(err.message); }
@@ -197,8 +220,11 @@ function App() {
     setSubmitting(false);
   }
 
-  const handleDeleteClass = async (id) => {
-    if (window.confirm("Delete?")) await deleteDoc(doc(firestoreDb, 'classes', id));
+  const handleDeleteClass = (id) => {
+    askConfirm("Delete Class?", "Are you sure you want to remove this scheduled class? This cannot be undone.", async () => {
+      await deleteDoc(doc(firestoreDb, 'classes', id));
+      showToast("Class deleted successfully", "success");
+    });
   }
 
   const handleAddNote = async (e) => {
@@ -231,7 +257,7 @@ function App() {
 
   const handleAddTest = async (e) => {
     e.preventDefault();
-    if (!testFile) return alert("Select PDF");
+    if (!testFile) return showToast("Please select a Test PDF file first!", "error");
     setSubmitting(true);
     try {
       const url = await uploadFile(testFile);
@@ -242,8 +268,11 @@ function App() {
     setSubmitting(false);
   }
 
-  const handleDeleteTest = async (id) => {
-    if (window.confirm("Delete?")) await deleteDoc(doc(firestoreDb, 'tests', id));
+  const handleDeleteTest = (id) => {
+    askConfirm("Delete Test?", "Deleting this test will also remove all associated results. Continue?", async () => {
+      await deleteDoc(doc(firestoreDb, 'tests', id));
+      showToast("Test removed", "info");
+    });
   }
 
   const startTest = (test) => {
@@ -288,7 +317,8 @@ function App() {
     setSubmitting(true);
     const final = studentsList.map(s => ({ studentId: s._id, name: s.name, email: s.email, status: attendanceRecords[s._id] || 'Present' }));
     await setDoc(doc(firestoreDb, 'attendance', attendanceDate), { date: attendanceDate, records: final });
-    alert("Saved!"); setSubmitting(false);
+    showToast("Attendance Saved Successfully!", "success");
+    setSubmitting(false);
   }
 
   useEffect(() => {
@@ -302,7 +332,12 @@ function App() {
   }, [activeTab, attendanceDate, user]);
 
   const handleApproveStudent = async (id) => { await updateDoc(doc(firestoreDb, 'users', id), { isApproved: true }); }
-  const handleDeleteStudent = async (id) => { if (window.confirm("Delete?")) await deleteDoc(doc(firestoreDb, 'users', id)); }
+  const handleDeleteStudent = (id) => {
+    askConfirm("Remove Student?", "This will permanently delete the student account and all their records.", async () => {
+      await deleteDoc(doc(firestoreDb, 'users', id));
+      showToast("Student profile deleted", "error");
+    });
+  }
 
   const beginRunningTest = () => { setTestMode('running'); setTimer(activeTest.durationMinutes * 60); }
 
@@ -1094,6 +1129,55 @@ function App() {
           )}
         </section>
       </main>
+
+      {/* Custom Toast Notification */}
+      <div className={`fixed bottom-8 right-8 z-[9999] transform transition-all duration-500 ease-out ${toast.visible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-20 opacity-0 scale-90 pointer-events-none'}`}>
+        <div className={`px-6 py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center space-x-4 border border-white/10 backdrop-blur-xl ${toast.type === 'success' ? 'bg-gradient-to-r from-emerald-500 to-teal-600' :
+          toast.type === 'error' ? 'bg-gradient-to-r from-rose-500 to-red-600' :
+            'bg-gradient-to-r from-blue-500 to-indigo-600'
+          } text-white`}>
+          <div className="bg-white/20 p-2 rounded-lg">
+            {toast.type === 'success' && <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>}
+            {toast.type === 'error' && <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>}
+            {toast.type === 'info' && <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>}
+          </div>
+          <div className="flex flex-col">
+            <span className="font-bold text-lg leading-tight capitalize">{toast.type}</span>
+            <span className="text-sm font-medium opacity-90">{toast.message}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Custom Confirmation Modal */}
+      {confirmDialog.visible && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setConfirmDialog({ ...confirmDialog, visible: false })}></div>
+          <div className="relative bg-[#1a1c1e] border border-white/10 rounded-3xl p-8 max-w-md w-full shadow-2xl transform transition-all scale-110 animate-fade-in">
+            <div className="bg-red-500/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 border border-red-500/20">
+              <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-2">{confirmDialog.title}</h3>
+            <p className="text-gray-400 mb-8 leading-relaxed">{confirmDialog.message}</p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setConfirmDialog({ ...confirmDialog, visible: false })}
+                className="flex-1 px-6 py-4 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-white/5"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  await confirmDialog.onConfirm();
+                  setConfirmDialog({ ...confirmDialog, visible: false });
+                }}
+                className="flex-1 px-6 py-4 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white font-semibold shadow-lg shadow-red-500/30 hover:brightness-110 transition-all"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
