@@ -1,15 +1,24 @@
-import { useState, useEffect } from 'react'
-import './index.css'
+import React, { useState, useEffect } from 'react';
+import { auth as firebaseAuth, storage as firebaseStorage, db as firestoreDb } from './config/firebase';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+  updateProfile
+} from 'firebase/auth';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import './index.css';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('Dashboard')
-
-  // Auth state
-  const [token, setToken] = useState(localStorage.getItem('token'))
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user') || 'null'))
-  const [isLoginView, setIsLoginView] = useState(true)
-  const [authForm, setAuthForm] = useState({ name: '', email: '', password: '' })
-  const [authError, setAuthError] = useState('')
+  const [activeTab, setActiveTab] = useState('Dashboard');
+  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user') || 'null'));
+  const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState('');
+  const [isLoginView, setIsLoginView] = useState(true);
+  const [authForm, setAuthForm] = useState({ name: '', email: '', password: '' });
 
   const [stats, setStats] = useState([])
   const [newClass, setNewClass] = useState({ subject: '', batch: '', time: '', status: 'Scheduled' })
@@ -94,47 +103,82 @@ function App() {
     });
   }, [token]);
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, async (fbUser) => {
+      if (fbUser) {
+        try {
+          const userDoc = await getDoc(doc(firestoreDb, 'users', fbUser.uid));
+          const userData = userDoc.exists() ? userDoc.data() : { name: fbUser.displayName, email: fbUser.email, role: 'student', isApproved: false };
+          setUser({ ...userData, id: fbUser.uid });
+          setToken(await fbUser.getIdToken());
+        } catch (err) {
+          console.error("Firestore access error:", err);
+          setUser({ name: fbUser.displayName, email: fbUser.email, role: 'student', isApproved: false, id: fbUser.uid });
+          setToken(await fbUser.getIdToken());
+        }
+      } else {
+        setUser(null);
+        setToken(null);
+      }
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
   const handleAuth = async (e) => {
     e.preventDefault();
     setAuthError('');
-    const endpoint = isLoginView ? 'signin' : 'signup';
+    setLoading(true);
     try {
-      const res = await fetch(`${VITE_API_URL}/${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(authForm)
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setToken(data.token);
-        setUser(data.user);
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+      if (isLoginView) {
+        // Sign In
+        const userCredential = await signInWithEmailAndPassword(firebaseAuth, authForm.email, authForm.password);
+        // Check approval if not admin
+        const userDoc = await getDoc(doc(firestoreDb, 'users', userCredential.user.uid));
+        if (userDoc.exists() && !userDoc.data().isApproved && userDoc.data().role !== 'admin') {
+          await signOut(firebaseAuth);
+          throw new Error('Your account is pending Admin approval.');
+        }
       } else {
-        setAuthError(data.error || 'Authentication failed');
+        // Sign Up
+        const userCredential = await createUserWithEmailAndPassword(firebaseAuth, authForm.email, authForm.password);
+        await updateProfile(userCredential.user, { displayName: authForm.name });
+
+        const role = authForm.email === 'tilakmishra.76@gmail.com' ? 'admin' : 'student';
+        const userData = {
+          name: authForm.name,
+          email: authForm.email,
+          role: role,
+          isApproved: role === 'admin',
+          createdAt: new Date().toISOString()
+        };
+
+        await setDoc(doc(firestoreDb, 'users', userCredential.user.uid), userData);
+        if (role !== 'admin') {
+          await signOut(firebaseAuth);
+          setAuthError('Registration successful! Please wait for Admin approval to login.');
+          setLoading(false);
+          return;
+        }
       }
     } catch (err) {
-      setAuthError(err.message);
+      let msg = err.message;
+      if (err.code === 'auth/user-not-found') msg = "User not found";
+      if (err.code === 'auth/wrong-password') msg = "Incorrect password";
+      setAuthError(msg);
     }
+    setLoading(false);
   }
 
   const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    signOut(firebaseAuth);
   }
 
   const uploadFile = async (file) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    const res = await fetch(`${VITE_API_URL}/upload`, {
-      method: 'POST',
-      body: formData
-    });
-    if (!res.ok) throw new Error('Upload failed');
-    const data = await res.json();
-    return data.url;
+    const storageRef = ref(firebaseStorage, `uploads/${Date.now()}-${file.name}`);
+    const snapshot = await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(snapshot.ref);
+    return downloadURL;
   };
 
   const handleAddClass = async (e) => {
