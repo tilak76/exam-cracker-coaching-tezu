@@ -1,0 +1,66 @@
+﻿[dotenv@17.3.1] injecting env (2) from .env -- tip: ΓÜí∩╕Å secrets for agents: https://dotenvx.com/as2
+Server running on port 5000
+node : Error connecting to 
+MongoDB: MongoParseError: 
+options usenewurlparser, 
+useunifiedtopology are not 
+supported
+At line:1 char:1
++ node server.js 2>&1 | 
+Out-File -Encoding utf8 
+error8.txt
++ ~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Error c  
+  onnectin...e not support   
+ ed:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+    at parseOptions 
+(C:\Users\Tilak 
+mishra\Desktop\COACHING APPr\
+backend\node_modules\mongodb\
+lib\connection_string.js:272:
+15)
+    at new MongoClient 
+(C:\Users\Tilak 
+mishra\Desktop\COACHING APPr\
+backend\node_modules\mongodb\
+lib\mongo_client.js:67:61)
+    at NativeConnection.creat
+eClient (C:\Users\Tilak 
+mishra\Desktop\COACHING APPr\
+backend\node_modules\mongoose
+\lib\drivers\node-mongodb-nat
+ive\connection.js:334:14)
+    at 
+NativeConnection.openUri 
+(C:\Users\Tilak 
+mishra\Desktop\COACHING APPr\
+backend\node_modules\mongoose
+\lib\connection.js:1075:34)
+    at Mongoose.connect 
+(C:\Users\Tilak 
+mishra\Desktop\COACHING APPr\
+backend\node_modules\mongoose
+\lib\mongoose.js:471:15)
+    at Object.<anonymous> 
+(C:\Users\Tilak 
+mishra\Desktop\COACHING 
+APPr\backend\server.js:36:10)
+    at Module._compile (node:
+internal/modules/cjs/loader:1
+730:14)
+    at Object..js (node:inter
+nal/modules/cjs/loader:1895:1
+0)
+    at Module.load (node:inte
+rnal/modules/cjs/loader:1465:
+32)
+    at Function._load (node:i
+nternal/modules/cjs/loader:12
+82:12) {
+  errorLabelSet: Set(0) {}
+}
