@@ -398,6 +398,64 @@ function App() {
     }
   }
 
+  if (loading) {
+    return <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', background: 'var(--bg-primary)' }}>Loading App...</div>;
+  }
+
+  if (!user) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', padding: '1rem' }}>
+        <div className="panel" style={{ padding: '3rem', position: 'relative', background: 'var(--bg-primary)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '32px', overflow: 'hidden', width: '100%', maxWidth: '420px', boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '6px', background: 'var(--accent-gradient)' }}></div>
+
+          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <div style={{ width: '72px', height: '72px', background: 'var(--accent-gradient)', borderRadius: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 15px 30px rgba(14, 165, 233, 0.2)' }}>
+              <svg style={{ width: '36px', height: '36px', color: 'white' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A10.003 10.003 0 0012 3a10.003 10.003 0 00-6.918 2.720m.051 10.24A10.003 10.003 0 0012 21a10.003 10.003 0 006.918-2.720M3 11a10.003 10.003 0 0110.24-6.918M21 11a10.003 10.003 0 00-10.24-6.918" /></svg>
+            </div>
+            <h2 style={{ fontSize: '2rem', fontWeight: '900', color: 'white', letterSpacing: '-0.02em' }}>{isLoginView ? 'Welcome' : 'Join Us'}</h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginTop: '8px' }}>Admin & Student Panel Access</p>
+          </div>
+
+          {authError && <div style={{ color: '#ef4444', marginBottom: '1.5rem', textAlign: 'center', fontSize: '0.9rem', background: 'rgba(239, 68, 68, 0.08)', padding: '1rem', borderRadius: '14px', border: '1px solid rgba(239, 68, 68, 0.15)' }}>{authError}</div>}
+
+          <form onSubmit={async (e) => { e.preventDefault(); await handleAuth(e); }} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {!isLoginView && (
+              <div>
+                <input style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '16px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white', outline: 'none' }} placeholder="Your Full Name" value={authForm.name} onChange={e => setAuthForm({ ...authForm, name: e.target.value })} required />
+              </div>
+            )}
+            <div>
+              <input type="email" style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '16px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white', outline: 'none' }} placeholder="Email address" value={authForm.email} onChange={e => setAuthForm({ ...authForm, email: e.target.value })} required />
+            </div>
+            <div>
+              <input type="password" style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '16px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white', outline: 'none' }} placeholder="Password" value={authForm.password} onChange={e => setAuthForm({ ...authForm, password: e.target.value })} required />
+            </div>
+            <button type="submit" className="btn btn-primary" style={{ padding: '1.1rem', borderRadius: '16px', fontWeight: '800', fontSize: '1.1rem', marginTop: '0.5rem' }} disabled={loading}>
+              {loading ? 'Authenticating...' : (isLoginView ? 'Secure Login' : 'Register Profile')}
+            </button>
+          </form>
+
+          <div style={{ marginTop: '2.5rem', textAlign: 'center', borderTop: '1px solid var(--border-glass)', paddingTop: '1.5rem' }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+              {isLoginView ? "Don't have an account?" : "Already registered?"}
+              <span style={{ color: 'var(--accent-primary)', cursor: 'pointer', fontWeight: '800', marginLeft: '6px' }} onClick={() => setIsLoginView(!isLoginView)}>
+                {isLoginView ? "Join here" : "Log in here"}
+              </span>
+            </p>
+          </div>
+        </div>
+
+        {/* Custom Notification Toast */}
+        {toast.visible && (
+          <div className="toast-vanilla" style={{
+            position: 'fixed', bottom: '30px', right: '30px', zIndex: 12000, background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', padding: '12px 20px', display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 15px 40px rgba(0,0,0,0.4)', backdropFilter: 'blur(10px)', animation: 'slide-in 0.3s ease-out', borderLeft: `6px solid ${toast.type === 'success' ? '#10b981' : '#ef4444'}`
+          }}>
+            <span style={{ fontSize: '0.95rem', fontWeight: '700', color: 'white', whiteSpace: 'nowrap' }}>{toast.message}</span>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <>
@@ -573,20 +631,6 @@ function App() {
                       </>
                     )}
                   </div>
-
-
-                  {!user && (
-                    <div style={{ background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(129, 140, 248, 0.1) 100%)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '2.5rem', borderRadius: '24px', marginTop: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backdropFilter: 'blur(10px)', animation: 'slide-in 0.5s ease' }}>
-                      <div style={{ maxWidth: '60%' }}>
-                        <h3 style={{ fontSize: '1.75rem', fontWeight: '900', color: 'white', marginBottom: '8px' }}>Admin & Student Panel</h3>
-                        <p style={{ margin: 0, color: '#94a3b8', fontSize: '1rem', lineHeight: '1.6' }}>Please login or register to access the coaching dashboard.</p>
-                      </div>
-                      <div style={{ display: 'flex', gap: '1rem' }}>
-                        <button className="btn" onClick={() => { setIsLoginView(true); setShowAuthModal(true); }} style={{ padding: '1rem 2rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', fontWeight: '700', borderRadius: '14px' }}>Login</button>
-                        <button className="btn btn-primary" onClick={() => { setIsLoginView(false); setShowAuthModal(true); }} style={{ padding: '1rem 2.5rem', fontWeight: '900', borderRadius: '14px', boxShadow: '0 10px 30px rgba(56, 189, 248, 0.3)' }}>Register</button>
-                      </div>
-                    </div>
-                  )}
 
                   <div className="dashboard-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
                     <div className="panel" style={{ gridColumn: '1 / -1' }}>
