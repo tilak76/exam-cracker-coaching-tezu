@@ -92,18 +92,53 @@ function App() {
     setConfirmDialog({ visible: true, title, message, onConfirm });
   };
 
-  const navItems = [
-    { name: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
-    { name: 'Assignments', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
-    { name: 'Study Material', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
-    { name: 'Tests', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' }
-  ];
+  const COURSES = {
+    'govt-exam': {
+      label: 'Government Exam Preparation',
+      short: 'Govt Exam',
+      color: '#38bdf8',
+      bg: 'rgba(56,189,248,0.12)',
+      border: 'rgba(56,189,248,0.25)',
+      emoji: '🏖️',
+      navItems: [
+        { name: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+        { name: 'Assignments', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
+        { name: 'Study Material', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
+        { name: 'Tests', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
+      ],
+    },
+    'english': {
+      label: 'English Skill Development',
+      short: 'English',
+      color: '#a78bfa',
+      bg: 'rgba(167,139,250,0.12)',
+      border: 'rgba(167,139,250,0.25)',
+      emoji: '🇬🇧',
+      navItems: [
+        { name: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+        { name: 'Assignments', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
+        { name: 'Study Material', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
+        { name: 'Speaking Tests', icon: 'M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z' },
+      ],
+    },
+  };
 
-  if (user?.role === 'admin') {
-    if (!navItems.some(i => i.name === 'Students')) navItems.push({ name: 'Students', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197' });
-    if (!navItems.some(i => i.name === 'Attendance')) navItems.push({ name: 'Attendance', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' });
-    if (!navItems.some(i => i.name === 'Admin Panel')) navItems.push({ name: 'Admin Panel', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37' });
-  }
+  const courseData = COURSES[user?.courseType] || null;
+
+  const navItems = user?.role === 'admin'
+    ? [
+      { name: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+      { name: 'Assignments', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
+      { name: 'Study Material', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
+      { name: 'Tests', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
+      { name: 'Students', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197' },
+      { name: 'Attendance', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
+      { name: 'Admin Panel', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37' },
+    ]
+    : (courseData?.navItems || [
+      { name: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+    ]);
+
 
   // Auth Observer
   useEffect(() => {
@@ -460,8 +495,84 @@ function App() {
     }
   }
 
+  const handleSelectCourse = async (courseType) => {
+    try {
+      await updateDoc(doc(firestoreDb, 'users', user.id), { courseType });
+      setUser(prev => ({ ...prev, courseType }));
+      showToast(`Course selected: ${COURSES[courseType].label}`, 'success');
+    } catch (err) {
+      showToast('Failed to save course selection.', 'error');
+    }
+  };
+
   if (loading) {
     return <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', background: 'var(--bg-primary)' }}>Loading App...</div>;
+  }
+
+  // Course selection screen — shown to logged-in students who haven't chosen a course yet
+  if (user && user.role === 'student' && !user.courseType) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', padding: '1.5rem' }}>
+        <div style={{ width: '100%', maxWidth: '580px' }}>
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🎓</div>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: '800', color: '#f8fafc', letterSpacing: '-0.02em', marginBottom: '0.6rem' }}>
+              What would you like to learn?
+            </h1>
+            <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.6' }}>
+              Hi <strong style={{ color: '#f8fafc' }}>{user.name}</strong>, choose your learning path.
+              Your dashboard will be customised for you.
+            </p>
+          </div>
+
+          {/* Course Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
+
+            {/* Govt Exam Card */}
+            <button
+              onClick={() => handleSelectCourse('govt-exam')}
+              style={{ background: 'rgba(56,189,248,0.05)', border: '1.5px solid rgba(56,189,248,0.2)', borderRadius: '24px', padding: '2rem 1.5rem', textAlign: 'left', cursor: 'pointer', transition: 'all 0.25s', position: 'relative', overflow: 'hidden' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(56,189,248,0.1)'; e.currentTarget.style.borderColor = 'rgba(56,189,248,0.5)'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(56,189,248,0.05)'; e.currentTarget.style.borderColor = 'rgba(56,189,248,0.2)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+            >
+              <div style={{ width: '52px', height: '52px', borderRadius: '16px', background: 'rgba(56,189,248,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.6rem', marginBottom: '1.25rem' }}>🏛️</div>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#f8fafc', marginBottom: '0.5rem' }}>Government Exam</h3>
+              <h4 style={{ fontSize: '0.85rem', fontWeight: '600', color: '#38bdf8', marginBottom: '0.75rem' }}>Preparation</h4>
+              <p style={{ fontSize: '0.82rem', color: '#94a3b8', lineHeight: '1.6', margin: 0 }}>
+                SSC, Railway, Banking, UPSC and more. Mock tests, study material & assignments.
+              </p>
+              <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '6px', color: '#38bdf8', fontSize: '0.82rem', fontWeight: '700' }}>
+                Select <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+              </div>
+            </button>
+
+            {/* English Card */}
+            <button
+              onClick={() => handleSelectCourse('english')}
+              style={{ background: 'rgba(167,139,250,0.05)', border: '1.5px solid rgba(167,139,250,0.2)', borderRadius: '24px', padding: '2rem 1.5rem', textAlign: 'left', cursor: 'pointer', transition: 'all 0.25s', position: 'relative', overflow: 'hidden' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(167,139,250,0.1)'; e.currentTarget.style.borderColor = 'rgba(167,139,250,0.5)'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(167,139,250,0.05)'; e.currentTarget.style.borderColor = 'rgba(167,139,250,0.2)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+            >
+              <div style={{ width: '52px', height: '52px', borderRadius: '16px', background: 'rgba(167,139,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.6rem', marginBottom: '1.25rem' }}>🇬🇧</div>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#f8fafc', marginBottom: '0.5rem' }}>English Skill</h3>
+              <h4 style={{ fontSize: '0.85rem', fontWeight: '600', color: '#a78bfa', marginBottom: '0.75rem' }}>Development</h4>
+              <p style={{ fontSize: '0.82rem', color: '#94a3b8', lineHeight: '1.6', margin: 0 }}>
+                Speaking, Grammar, Vocabulary & Writing. Improve your English for career & daily life.
+              </p>
+              <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '6px', color: '#a78bfa', fontSize: '0.82rem', fontWeight: '700' }}>
+                Select <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+              </div>
+            </button>
+          </div>
+
+          {/* Logout */}
+          <div style={{ textAlign: 'center' }}>
+            <button onClick={logout} style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '0.85rem', cursor: 'pointer', textDecoration: 'underline' }}>Sign out</button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!user) {
@@ -1462,58 +1573,110 @@ function App() {
                 </div>
               )}
 
-              {activeTab === 'Students' && user?.role === 'admin' && (
-                <div className="panel" style={{ width: '100%' }}>
-                  <div className="panel-header">
-                    <h3 className="panel-title">👥 Students & User Management</h3>
-                    <div style={{ background: 'var(--bg-glass)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.9rem', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
-                      Total Students: {studentsList.length}
+              {activeTab === 'Students' && user?.role === 'admin' && (() => {
+                const [courseFilter, setCourseFilter] = React.useState('All');
+                const filtered = courseFilter === 'All' ? studentsList : studentsList.filter(s => s.courseType === courseFilter);
+                return (
+                  <div className="panel" style={{ width: '100%' }}>
+                    <div className="panel-header">
+                      <h3 className="panel-title">👥 Students & User Management</h3>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <span style={{ background: 'var(--bg-glass)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem', color: '#38bdf8', border: '1px solid rgba(56,189,248,0.2)' }}>Total: {studentsList.length}</span>
+                      </div>
+                    </div>
+
+                    {/* Course Filter */}
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+                      {['All', 'govt-exam', 'english', 'none'].map(f => (
+                        <button key={f} onClick={() => setCourseFilter(f)} style={{ padding: '6px 14px', borderRadius: '10px', fontSize: '0.8rem', fontWeight: '700', border: 'none', cursor: 'pointer', background: courseFilter === f ? (f === 'govt-exam' ? 'rgba(56,189,248,0.2)' : f === 'english' ? 'rgba(167,139,250,0.2)' : 'rgba(255,255,255,0.1)') : 'rgba(255,255,255,0.04)', color: courseFilter === f ? 'white' : '#64748b' }}>
+                          {f === 'All' ? 'All' : f === 'govt-exam' ? '🏛️ Govt Exam' : f === 'english' ? '🇬🇧 English' : '❓ Not Selected'}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))' }}>
+                      {filtered.map(s => (
+                        <div key={s._id} style={{ background: 'rgba(255,255,255,0.02)', padding: '1.5rem', borderRadius: '24px', border: '1px solid var(--border-glass)', transition: '0.3s' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
+                            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                              <div style={{ width: '50px', height: '50px', borderRadius: '15px', overflow: 'hidden', border: '2px solid var(--border-glass)' }}>
+                                <img src={`https://ui-avatars.com/api/?name=${s.name}&background=random&color=fff`} alt={s.name} style={{ width: '100%' }} />
+                              </div>
+                              <div>
+                                <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: '800' }}>{s.name}</h4>
+                                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{s.email}</p>
+                              </div>
+                            </div>
+                            <span style={{ padding: '4px 10px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: '900', textTransform: 'uppercase', background: s.isApproved ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)', color: s.isApproved ? '#10b981' : '#f59e0b', border: `1px solid ${s.isApproved ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)'}` }}>
+                              {s.isApproved ? 'Verified' : 'Pending'}
+                            </span>
+                          </div>
+
+                          {/* Course Badge */}
+                          <div style={{ marginBottom: '1rem' }}>
+                            {s.courseType === 'govt-exam' && (
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '8px', background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.2)', color: '#38bdf8', fontSize: '0.75rem', fontWeight: '700' }}>🏛️ Government Exam Prep</span>
+                            )}
+                            {s.courseType === 'english' && (
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '8px', background: 'rgba(167,139,250,0.1)', border: '1px solid rgba(167,139,250,0.2)', color: '#a78bfa', fontSize: '0.75rem', fontWeight: '700' }}>🇬🇧 English Skill Dev.</span>
+                            )}
+                            {!s.courseType && (
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '8px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: '#64748b', fontSize: '0.75rem', fontWeight: '700' }}>❓ Course not selected</span>
+                            )}
+                          </div>
+
+                          <div style={{ display: 'flex', gap: '0.75rem' }}>
+                            {!s.isApproved && (
+                              <button className="btn btn-primary" onClick={() => handleApproveStudent(s._id)} style={{ flex: 1, padding: '0.7rem', fontSize: '0.85rem', fontWeight: '800', background: '#10b981' }}>Verify User</button>
+                            )}
+                            <button
+                              className="btn"
+                              onClick={() => { askConfirm("Confirm Deletion", `Are you sure you want to remove ${s.name}? This action is permanent.`, () => handleDeleteStudent(s._id)); }}
+                              style={{ flex: s.isApproved ? 1 : 0.5, padding: '0.7rem', fontSize: '0.85rem', fontWeight: '700', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', background: 'rgba(239,68,68,0.05)' }}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      {filtered.length === 0 && (
+                        <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '4rem', color: 'var(--text-secondary)' }}>No students found for this filter.</div>
+                      )}
                     </div>
                   </div>
-                  <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))' }}>
-                    {studentsList.map(s => (
-                      <div key={s._id} style={{ background: 'rgba(255,255,255,0.02)', padding: '1.5rem', borderRadius: '24px', border: '1px solid var(--border-glass)', transition: '0.3s' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1.5rem' }}>
-                          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                            <div style={{ width: '50px', height: '50px', borderRadius: '15px', overflow: 'hidden', border: '2px solid var(--border-glass)' }}>
-                              <img src={`https://ui-avatars.com/api/?name=${s.name}&background=random&color=fff`} alt={s.name} style={{ width: '100%' }} />
-                            </div>
-                            <div>
-                              <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '800' }}>{s.name}</h4>
-                              <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{s.email}</p>
-                            </div>
-                          </div>
-                          <span style={{ padding: '4px 10px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: '900', textTransform: 'uppercase', background: s.isApproved ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)', color: s.isApproved ? '#10b981' : '#f59e0b', border: `1px solid ${s.isApproved ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)'}` }}>
-                            {s.isApproved ? 'Verified' : 'Pending'}
-                          </span>
-                        </div>
+                );
+              })()}
 
-                        <div style={{ display: 'flex', gap: '0.75rem' }}>
-                          {!s.isApproved && (
-                            <button className="btn btn-primary" onClick={() => handleApproveStudent(s._id)} style={{ flex: 1, padding: '0.7rem', fontSize: '0.85rem', fontWeight: '800', background: '#10b981' }}>Verify User</button>
-                          )}
-                          <button
-                            className="btn"
-                            onClick={() => {
-                              askConfirm("Confirm Deletion", `Are you sure you want to remove ${s.name}? This action is permanent.`, () => handleDeleteStudent(s._id));
-                            }}
-                            style={{ flex: s.isApproved ? 1 : 0.5, padding: '0.7rem', fontSize: '0.85rem', fontWeight: '700', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', background: 'rgba(239,68,68,0.05)' }}
-                          >
-                            Remove
-                          </button>
+              {(activeTab === 'Speaking Tests') && (
+                <div style={{ width: '100%' }}>
+                  <div className="panel" style={{ padding: '1.5rem 2rem', marginBottom: '1.5rem', background: 'rgba(167,139,250,0.05)', border: '1px solid rgba(167,139,250,0.15)', borderRadius: '16px' }}>
+                    <p style={{ margin: 0, color: '#a78bfa', fontSize: '0.9rem', fontWeight: '600' }}>🇬🇧 English Skill Development — Speaking & Skill Tests</p>
+                  </div>
+                  {/* Reuse Tests UI */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                    {[...tests].reverse().map((t, idx) => {
+                      const isLocked = user?.role === 'student' && !user?.isApproved && idx >= 2;
+                      return (
+                        <div key={idx} style={{ background: isLocked ? 'rgba(255,255,255,0.02)' : 'rgba(167,139,250,0.05)', border: `1px solid ${isLocked ? 'rgba(255,255,255,0.04)' : 'rgba(167,139,250,0.2)'}`, borderRadius: '20px', overflow: 'hidden', opacity: isLocked ? 0.65 : 1 }}>
+                          <div style={{ height: '5px', background: isLocked ? '#334155' : 'linear-gradient(90deg,#a78bfa,#7c3aed)' }} />
+                          <div style={{ padding: '1.5rem' }}>
+                            <h3 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '0.75rem', color: isLocked ? '#64748b' : '#f8fafc' }}>{t.title}</h3>
+                            <p style={{ fontSize: '0.82rem', color: '#64748b', marginBottom: '1.25rem' }}>{t.subject} • {t.durationMinutes}m • {t.questionsCount} Qs</p>
+                            {isLocked ? (
+                              <button onClick={() => showToast('Verify account to unlock all tests.', 'warning')} style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', color: '#64748b', cursor: 'pointer', fontWeight: '700' }}>🔒 Locked</button>
+                            ) : (
+                              <button className="btn" onClick={() => startTest(t)} style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', background: 'rgba(167,139,250,0.15)', border: '1px solid rgba(167,139,250,0.3)', color: '#a78bfa', fontWeight: '700' }}>Start Test</button>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                    {studentsList.length === 0 && (
-                      <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '4rem', color: 'var(--text-secondary)' }}>
-                        No registered students found.
-                      </div>
-                    )}
+                      );
+                    })}
+                    {tests.length === 0 && <div style={{ gridColumn: '1/-1', padding: '4rem', textAlign: 'center', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px dashed var(--border-glass)' }}>🇬🇧 No speaking tests uploaded yet.</div>}
                   </div>
                 </div>
               )}
 
-              {activeTab !== 'Dashboard' && activeTab !== 'Admin Panel' && activeTab !== 'Assignments' && activeTab !== 'Study Material' && activeTab !== 'Tests' && activeTab !== 'Attendance' && activeTab !== 'Students' && (
+              {activeTab !== 'Dashboard' && activeTab !== 'Admin Panel' && activeTab !== 'Assignments' && activeTab !== 'Study Material' && activeTab !== 'Tests' && activeTab !== 'Attendance' && activeTab !== 'Students' && activeTab !== 'Speaking Tests' && (
                 <div className="panel" style={{ textAlign: 'center', padding: '100px 20px' }}>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="64" height="64" style={{ color: 'var(--text-secondary)', margin: '0 auto 1.5rem' }}>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
