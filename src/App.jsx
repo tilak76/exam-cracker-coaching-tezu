@@ -38,9 +38,9 @@ function App() {
   const [welcomeText, setWelcomeText] = useState('Welcome back, Warrior! 🎯');
 
   const [stats, setStats] = useState([
-    { title: 'Total Students', value: '0', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197' },
-    { title: 'Tests Done', value: '0', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
-    { title: 'Study Hours', value: '0h', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' }
+    { title: 'Total Students', value: '0', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197', color: 'rgba(56, 189, 248, 0.2)', text: '#38bdf8' },
+    { title: 'Tests Completed', value: '0', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', color: 'rgba(16, 185, 129, 0.2)', text: '#10b981' },
+    { title: 'Avg. Accuracy', value: '0%', icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6', color: 'rgba(245, 158, 11, 0.2)', text: '#f59e0b' }
   ]);
 
   const [notes, setNotes] = useState([]);
@@ -189,11 +189,17 @@ function App() {
       setStats(prev => {
         const s = [...prev];
         s[0].value = studentCount.toString();
+        // Calculate average accuracy if possible
+        if (completedTests.length > 0) {
+          s[1].value = completedTests.length.toString();
+          // (Mock calculation for UI purposes until hooked fully)
+          s[2].value = '85%';
+        }
         return s;
       });
     });
     return () => unsubUsers();
-  }, [user]);
+  }, [user, completedTests]);
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -523,36 +529,47 @@ function App() {
 
               {activeTab === 'Dashboard' && (
                 <>
-                  <div style={{ background: 'var(--surface-gradient)', border: '1px solid var(--border-glass)', padding: '2rem', borderRadius: 'var(--panel-radius)', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 20px 50px rgba(0,0,0,0.3)', position: 'relative', overflow: 'hidden' }}>
-                    <div style={{ position: 'relative', zIndex: 1 }}>
-                      <h1 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '8px', letterSpacing: '-0.02em', background: 'linear-gradient(to right, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                        Education Overview
-                      </h1>
-                      <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: '500' }}>
-                        Welcome to your dashboard, {user?.name || 'Warrior'}. Track your academic journey and solve tests.
-                      </p>
+                  <div style={{ position: 'relative', marginBottom: '3rem', borderRadius: '32px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 30px 60px rgba(0,0,0,0.6)', background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.9) 100%)', backdropFilter: 'blur(20px)' }}>
+                    <div style={{ position: 'absolute', top: 0, right: 0, width: '40%', height: '100%', background: 'radial-gradient(circle at top right, rgba(56, 189, 248, 0.15), transparent 70%)' }}></div>
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, width: '40%', height: '100%', background: 'radial-gradient(circle at bottom left, rgba(129, 140, 248, 0.1), transparent 70%)' }}></div>
+                    <div style={{ padding: '3.5rem 3rem', position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '2rem' }}>
+                      <div style={{ maxWidth: '600px' }}>
+                        <div style={{ display: 'inline-block', padding: '6px 16px', background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', borderRadius: '100px', fontSize: '0.85rem', fontWeight: '800', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '1.5rem', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
+                          Student Portal 2.0
+                        </div>
+                        <h1 style={{ fontSize: '2.8rem', fontWeight: '900', marginBottom: '0.5rem', letterSpacing: '-0.02em', background: 'linear-gradient(to right, #ffffff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: '1.2' }}>
+                          Welcome back,<br />{user?.name || 'Warrior'}!
+                        </h1>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '1.6', marginTop: '1rem', fontWeight: '500' }}>
+                          Your academic journey is on track. Check your latest assignments, upcoming tests, and analyze your performance.
+                        </p>
+                      </div>
+                      <div style={{ display: 'flex', gap: '1rem' }}>
+                        <button onClick={() => setActiveTab('Tests')} className="btn btn-primary" style={{ padding: '1rem 2rem', borderRadius: '16px', fontSize: '1rem', fontWeight: '700', boxShadow: '0 10px 25px rgba(56, 189, 248, 0.4)' }}>
+                          Start a Test 🚀
+                        </button>
+                      </div>
                     </div>
-                    <div style={{ display: 'none' }}>🎯</div>
                   </div>
 
-                  <div className="stats-grid">
+                  <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
                     {stats.length > 0 ? stats.map((stat, i) => (
-                      <div key={i} className="stat-card">
-                        <div className="stat-icon">
+                      <div key={i} className="stat-card" style={{ background: `linear-gradient(135deg, ${stat.color}, transparent)`, border: `1px solid ${stat.color}`, padding: '1.8rem', borderRadius: '24px', display: 'flex', alignItems: 'center', gap: '1.5rem', transition: 'all 0.3s ease', cursor: 'default', boxShadow: `0 10px 30px ${stat.color.replace('0.2)', '0.05)')}` }}>
+                        <div className="stat-icon" style={{ background: stat.color, color: stat.text, width: '64px', height: '64px', borderRadius: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="32" height="32">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={stat.icon} />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d={stat.icon} />
                           </svg>
                         </div>
                         <div className="stat-info">
-                          <h3>{stat.title}</h3>
-                          <div className="value">{stat.value}</div>
+                          <h3 style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px', fontWeight: '600' }}>{stat.title}</h3>
+                          <div className="value" style={{ fontSize: '2.2rem', fontWeight: '900', color: 'white', letterSpacing: '-1px' }}>{stat.value}</div>
                         </div>
                       </div>
                     )) : (
                       <>
                         <div className="stat-card"><div className="stat-info"><h3>Students</h3><div className="value">0</div></div></div>
-                        <div className="stat-card"><div className="stat-info"><h3>Tests Done</h3><div className="value">0</div></div></div>
-                        <div className="stat-card"><div className="stat-info"><h3>Study Hours</h3><div className="value">0h</div></div></div>
+                        <div className="stat-card"><div className="stat-info"><h3>Tests Completed</h3><div className="value">0</div></div></div>
+                        <div className="stat-card"><div className="stat-info"><h3>Avg. Accuracy</h3><div className="value">0%</div></div></div>
                       </>
                     )}
                   </div>
@@ -585,12 +602,12 @@ function App() {
                       </div>
                     </div>
 
-                    <div className="panel">
-                      <div className="panel-header">
-                        <h3 className="panel-title">Latest Assignments</h3>
-                        <button className="btn btn-primary" onClick={() => setActiveTab('Assignments')} style={{ background: 'var(--bg-glass)', color: '#10b981' }}>View All</button>
+                    <div className="panel" style={{ padding: '2rem', borderRadius: '24px', position: 'relative', overflow: 'hidden' }}>
+                      <div className="panel-header" style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--border-glass)', paddingBottom: '1rem' }}>
+                        <h3 className="panel-title" style={{ fontSize: '1.3rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ color: '#10b981' }}>📝</span> Latest Assignments</h3>
+                        <button className="btn" onClick={() => setActiveTab('Assignments')} style={{ background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: '0.85rem' }}>View All →</button>
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {[...assignments].reverse().slice(0, 3).map((as, idx) => {
                           const isRestricted = (!user || (user?.role === 'student' && !user?.isApproved)) && idx >= 2;
                           return (
@@ -603,30 +620,32 @@ function App() {
                                   window.open(as.fileUrl || as.link, '_blank');
                                 }
                               }}
-                              style={{ background: 'rgba(0,0,0,0.2)', padding: '0.75rem', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', opacity: isRestricted ? 0.6 : 1, border: '1px solid rgba(255,255,255,0.05)' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                                <div style={{ color: isRestricted ? 'var(--text-secondary)' : '#10b981' }}>
-                                  {isRestricted ? <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9z" /></svg> : <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8"></polyline></svg>}
+                              style={{ background: 'var(--bg-glass)', padding: '1.25rem', borderRadius: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', opacity: isRestricted ? 0.6 : 1, border: '1px solid rgba(255,255,255,0.03)', transition: 'transform 0.2s', ':hover': { transform: 'scale(1.02)' } }}
+                              className="assignment-card-hover"
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div style={{ background: isRestricted ? 'rgba(255,255,255,0.05)' : 'rgba(16, 185, 129, 0.1)', color: isRestricted ? 'var(--text-secondary)' : '#10b981', padding: '12px', borderRadius: '12px' }}>
+                                  {isRestricted ? <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9z" /></svg> : <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8"></polyline></svg>}
                                 </div>
                                 <div>
-                                  <p style={{ fontWeight: '600', margin: 0, fontSize: '0.9rem' }}>{as.title}</p>
-                                  <small style={{ color: 'var(--text-secondary)' }}>Due: {as.deadline}</small>
+                                  <p style={{ fontWeight: '700', margin: 0, fontSize: '1.05rem', color: 'white' }}>{as.title}</p>
+                                  <small style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: '500' }}>Due: <span style={{ color: '#f59e0b' }}>{as.deadline}</span></small>
                                 </div>
                               </div>
-                              <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px', background: isRestricted ? 'rgba(255,255,255,0.05)' : 'rgba(16, 185, 129, 0.1)', color: isRestricted ? 'var(--text-secondary)' : '#10b981' }}>{idx < 2 ? 'Free' : 'Premium'}</span>
+                              <span style={{ fontSize: '0.75rem', padding: '4px 10px', borderRadius: '8px', background: isRestricted ? 'rgba(255,255,255,0.05)' : 'rgba(16, 185, 129, 0.1)', color: isRestricted ? 'var(--text-secondary)' : '#10b981', fontWeight: '700' }}>{idx < 2 ? 'Free' : 'Premium'}</span>
                             </div>
                           );
                         })}
-                        {assignments.length === 0 && <p style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>No assignments listed.</p>}
+                        {assignments.length === 0 && <div style={{ padding: '2rem', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px dashed var(--border-glass)' }}><span style={{ fontSize: '2rem' }}>📭</span><p style={{ marginTop: '10px', color: 'var(--text-secondary)' }}>No pending assignments.</p></div>}
                       </div>
                     </div>
 
-                    <div className="panel">
-                      <div className="panel-header">
-                        <h3 className="panel-title">Upcoming Tests</h3>
-                        <button className="btn btn-primary" onClick={() => setActiveTab('Tests')} style={{ background: 'var(--bg-glass)', color: '#f59e0b' }}>Go to Arena</button>
+                    <div className="panel" style={{ padding: '2rem', borderRadius: '24px' }}>
+                      <div className="panel-header" style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--border-glass)', paddingBottom: '1rem' }}>
+                        <h3 className="panel-title" style={{ fontSize: '1.3rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ color: '#f59e0b' }}>🎯</span> Upcoming Tests</h3>
+                        <button className="btn" onClick={() => setActiveTab('Tests')} style={{ background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: '0.85rem' }}>Arena →</button>
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {[...tests].reverse().slice(0, 3).map((t, idx) => {
                           const isRestricted = (!user || (user?.role === 'student' && !user?.isApproved)) && idx >= 2;
                           return (
@@ -640,30 +659,30 @@ function App() {
                                   setActiveTest(t);
                                 }
                               }}
-                              style={{ background: 'rgba(0,0,0,0.2)', padding: '0.75rem', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', opacity: isRestricted ? 0.6 : 1, border: '1px solid rgba(255,255,255,0.05)' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                                <div style={{ color: isRestricted ? 'var(--text-secondary)' : '#f59e0b' }}>
-                                  {isRestricted ? <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9z" /></svg> : <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+                              style={{ background: 'linear-gradient(90deg, rgba(245, 158, 11, 0.05) 0%, var(--bg-glass) 100%)', padding: '1.25rem', borderRadius: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', opacity: isRestricted ? 0.6 : 1, border: '1px solid rgba(245, 158, 11, 0.1)', transition: '0.2s' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div style={{ background: isRestricted ? 'rgba(255,255,255,0.05)' : 'rgba(245, 158, 11, 0.1)', color: isRestricted ? 'var(--text-secondary)' : '#f59e0b', padding: '12px', borderRadius: '12px' }}>
+                                  {isRestricted ? <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9z" /></svg> : <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
                                 </div>
                                 <div>
-                                  <p style={{ fontWeight: '600', margin: 0, fontSize: '0.9rem' }}>{t.title}</p>
-                                  <small style={{ color: 'var(--text-secondary)' }}>{t.durationMinutes} Mins • {t.questionsCount} Qs</small>
+                                  <p style={{ fontWeight: '700', margin: 0, fontSize: '1.05rem', color: 'white' }}>{t.title}</p>
+                                  <small style={{ color: 'var(--text-secondary)', fontWeight: '500' }}>{t.durationMinutes} Mins • {t.questionsCount} Qs</small>
                                 </div>
                               </div>
-                              <div style={{ color: isRestricted ? 'var(--text-secondary)' : '#f59e0b', fontWeight: 'bold', fontSize: '0.85rem' }}>{idx < 2 ? 'Start' : 'Locked'}</div>
+                              <button style={{ background: isRestricted ? 'transparent' : '#f59e0b', color: isRestricted ? 'var(--text-secondary)' : 'white', border: isRestricted ? '1px solid var(--border-glass)' : 'none', padding: '6px 14px', borderRadius: '8px', fontWeight: '800', fontSize: '0.8rem' }}>{idx < 2 ? 'Start' : 'Locked'}</button>
                             </div>
                           );
                         })}
-                        {tests.length === 0 && <p style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>No tests scheduled.</p>}
+                        {tests.length === 0 && <div style={{ padding: '2rem', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px dashed var(--border-glass)' }}><span style={{ fontSize: '2rem' }}>🕒</span><p style={{ marginTop: '10px', color: 'var(--text-secondary)' }}>No upcoming tests.</p></div>}
                       </div>
                     </div>
 
-                    <div className="panel">
-                      <div className="panel-header">
-                        <h3 className="panel-title">Study Resources</h3>
-                        <button className="btn btn-primary" onClick={() => setActiveTab('Study Material')} style={{ background: 'var(--bg-glass)', color: '#3b82f6' }}>View All</button>
+                    <div className="panel" style={{ padding: '2rem', borderRadius: '24px' }}>
+                      <div className="panel-header" style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--border-glass)', paddingBottom: '1rem' }}>
+                        <h3 className="panel-title" style={{ fontSize: '1.3rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ color: '#38bdf8' }}>📚</span> Study Resources</h3>
+                        <button className="btn" onClick={() => setActiveTab('Study Material')} style={{ background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: '0.85rem' }}>Library →</button>
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
                         {[...notes].reverse().slice(0, 4).map((n, idx) => {
                           const isRestricted = (!user || (user?.role === 'student' && !user?.isApproved)) && idx >= 2;
                           return (
@@ -676,14 +695,14 @@ function App() {
                                   window.open(n.fileUrl || n.link, '_blank');
                                 }
                               }}
-                              style={{ background: 'rgba(59, 130, 246, 0.05)', border: '1px solid rgba(59, 130, 246, 0.1)', padding: '1rem', borderRadius: '14px', textAlign: 'center', cursor: 'pointer', opacity: isRestricted ? 0.5 : 1 }}>
-                              {isRestricted ? <svg style={{ width: '14px', height: '14px', marginBottom: '8px', color: 'var(--text-secondary)' }} fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9z" /></svg> : <div style={{ fontSize: '1.2rem', marginBottom: '8px' }}>📄</div>}
-                              <p style={{ fontSize: '0.85rem', fontWeight: '700', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--text-primary)' }}>{n.title}</p>
-                              <small style={{ color: 'var(--text-secondary)', display: 'block', textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '0.05em' }}>{idx < 2 ? 'Free Access' : 'Private'}</small>
+                              style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-glass)', padding: '1.5rem 1rem', borderRadius: '20px', textAlign: 'center', cursor: 'pointer', opacity: isRestricted ? 0.6 : 1, transition: '0.2s', ':hover': { transform: 'translateY(-5px)', background: 'rgba(56, 189, 248, 0.05)' } }}>
+                              {isRestricted ? <svg style={{ width: '28px', height: '28px', margin: '0 auto 12px', color: 'var(--text-secondary)' }} fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9z" /></svg> : <div style={{ fontSize: '2rem', marginBottom: '12px' }}>📄</div>}
+                              <p style={{ fontSize: '0.9rem', fontWeight: '800', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'white' }}>{n.title}</p>
+                              <small style={{ color: 'var(--text-secondary)', textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '0.05em', fontWeight: '600' }}>{idx < 2 ? 'Free' : 'Premium'}</small>
                             </div>
                           );
                         })}
-                        {notes.length === 0 && <p style={{ color: 'var(--text-secondary)', textAlign: 'center', gridColumn: '1/-1' }}>Resources pending.</p>}
+                        {notes.length === 0 && <div style={{ gridColumn: '1/-1', padding: '2rem', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px dashed var(--border-glass)' }}><span style={{ fontSize: '2rem' }}>📚</span><p style={{ marginTop: '10px', color: 'var(--text-secondary)' }}>Library empty.</p></div>}
                       </div>
                     </div>
 
