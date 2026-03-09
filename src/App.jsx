@@ -135,6 +135,32 @@ function App() {
   }, [loading]);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [installPrompt, setInstallPrompt] = useState(null);
+  const [isInstalled, setIsInstalled] = useState(false);
+
+  // PWA Install Prompt Listener
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    window.addEventListener('appinstalled', () => {
+      setIsInstalled(true);
+      setInstallPrompt(null);
+      showToast('App installed successfully! 🎉', 'success');
+    });
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setInstallPrompt(null);
+    }
+  };
 
   // Real-time Data Listeners
   useEffect(() => {
@@ -529,6 +555,27 @@ function App() {
           </div>
 
           <div className="user-profile">
+            {/* PWA Install Button */}
+            {installPrompt && !isInstalled && (
+              <button
+                onClick={handleInstall}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '7px',
+                  padding: '0.5rem 1rem', borderRadius: '10px',
+                  background: 'linear-gradient(135deg, rgba(56,189,248,0.15), rgba(79,70,229,0.15))',
+                  border: '1px solid rgba(56,189,248,0.3)', color: '#38bdf8',
+                  fontSize: '0.82rem', fontWeight: '700', cursor: 'pointer',
+                  transition: 'all 0.2s', whiteSpace: 'nowrap'
+                }}
+                title="Install App on your device"
+              >
+                <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Install App
+              </button>
+            )}
+
             {!user ? (
               <div style={{ display: 'flex', gap: '0.8rem' }}>
                 <button className="btn" onClick={() => { setIsLoginView(true); setShowAuthModal(true); }} style={{ padding: '0.5rem 1.25rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.85rem', fontWeight: '600' }}>Login</button>
