@@ -1050,94 +1050,190 @@ function App() {
                 </>
               )}
 
-              {activeTab === 'Admin Panel' && user?.role === 'admin' && (
-                <div className="dashboard-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+              {activeTab === 'Admin Panel' && user?.role === 'admin' && (() => {
+                const [adminTab, setAdminTab] = React.useState('material');
+                const AP_TABS = [
+                  { id: 'material', label: 'Study Material', emoji: '📚', color: '#38bdf8', border: 'rgba(56,189,248,0.3)' },
+                  { id: 'assignment', label: 'Assignment', emoji: '📝', color: '#10b981', border: 'rgba(16,185,129,0.3)' },
+                  { id: 'test', label: 'Test', emoji: '⚡', color: '#f59e0b', border: 'rgba(245,158,11,0.3)' },
+                ];
+                const active = AP_TABS.find(t => t.id === adminTab);
 
-                  <div className="panel">
-                    <div className="panel-header"><h3 className="panel-title">📚 Upload Study Material / Notes</h3></div>
-                    <form onSubmit={handleAddNote} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                      <input style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white' }} placeholder="Title (e.g. Physics Chapter 4)" value={newNote.title} onChange={e => setNewNote({ ...newNote, title: e.target.value })} required />
-                      <input style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white' }} placeholder="Subject/Tag" value={newNote.subject} onChange={e => setNewNote({ ...newNote, subject: e.target.value })} required />
+                const inputStyle = {
+                  width: '100%', padding: '0.9rem 1.1rem', borderRadius: '14px',
+                  border: `1.5px solid ${active.border}`,
+                  background: 'rgba(255,255,255,0.04)', color: 'white',
+                  outline: 'none', fontSize: '0.95rem', boxSizing: 'border-box',
+                  transition: 'border-color 0.2s'
+                };
 
-                      <label style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>Upload File (PDF/Docs/Images)</label>
-                      <input type="file" id="noteFile" style={{ display: 'none' }} onChange={e => setNoteFile(e.target.files[0])} />
-                      <button type="button" className="btn" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-glass)', textAlign: 'left', padding: '0.75rem', color: noteFile ? '#10b981' : 'white' }} onClick={() => document.getElementById('noteFile').click()}>
-                        {noteFile ? `📁 ${noteFile.name}` : 'Click here to Choose File...'}
-                      </button>
+                return (
+                  <div style={{ width: '100%', maxWidth: '640px', margin: '0 auto' }}>
 
-                      <label style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>OR Drop a Link below</label>
-                      <input style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white' }} placeholder="Link URL (Optional)" value={newNote.link} onChange={e => setNewNote({ ...newNote, link: e.target.value })} />
-
-                      <button type="submit" className="btn btn-primary" disabled={submitting} style={{ background: '#38bdf8' }}>{submitting ? 'Uploading...' : 'Upload Material 🚀'}</button>
-                    </form>
-                  </div>
-
-                  <div className="panel">
-                    <div className="panel-header"><h3 className="panel-title">📝 Upload Assignment</h3></div>
-                    <form onSubmit={handleAddAssignment} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                      <input style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white' }} placeholder="Assignment Title" value={newAssignment.title} onChange={e => setNewAssignment({ ...newAssignment, title: e.target.value })} required />
-                      <input style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white' }} placeholder="Subject" value={newAssignment.subject} onChange={e => setNewAssignment({ ...newAssignment, subject: e.target.value })} required />
-                      <input type="date" style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white' }} value={newAssignment.deadline} onChange={e => setNewAssignment({ ...newAssignment, deadline: e.target.value })} required />
-
-                      <label style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>Assignment Document (PDF)</label>
-                      <input type="file" id="assignFile" style={{ display: 'none' }} onChange={e => setAssignmentFile(e.target.files[0])} />
-                      <button type="button" className="btn" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-glass)', textAlign: 'left', padding: '0.75rem', color: assignmentFile ? '#10b981' : 'white' }} onClick={() => document.getElementById('assignFile').click()}>
-                        {assignmentFile ? `📁 ${assignmentFile.name}` : 'Click here to Choose File...'}
-                      </button>
-
-                      <button type="submit" className="btn btn-primary" disabled={submitting} style={{ background: '#10b981' }}>{submitting ? 'Uploading...' : 'Publish Assignment 📤'}</button>
-                    </form>
-                  </div>
-
-                  <div className="panel" style={{ gridColumn: '1 / -1' }}>
-                    <div className="panel-header"><h3 className="panel-title">⏱ Upload Test PDF & Generate OMR</h3></div>
-                    <form onSubmit={handleAddTest} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                      <div style={{ display: 'flex', gap: '1rem' }}>
-                        <input style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white' }} placeholder="Test Title (e.g. Chapter 4 Quiz)" value={newTest.title} onChange={e => setNewTest({ ...newTest, title: e.target.value })} required />
-                        <input style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white' }} placeholder="Subject" value={newTest.subject} onChange={e => setNewTest({ ...newTest, subject: e.target.value })} required />
-                      </div>
-                      <div style={{ display: 'flex', gap: '1rem' }}>
-                        <input type="number" style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white' }} placeholder="Duration (Mins)" value={newTest.durationMinutes} onChange={e => setNewTest({ ...newTest, durationMinutes: Number(e.target.value) })} required />
-                        <input type="number" step="0.01" style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white' }} placeholder="Negative Marks (- e.g. 0.25)" value={newTest.negativeMark} onChange={e => setNewTest({ ...newTest, negativeMark: Number(e.target.value) })} required />
-                        <input type="number" style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white' }} placeholder="No. of Questions" value={newTest.questionsCount} onChange={e => setNewTest({ ...newTest, questionsCount: Number(e.target.value), answerKey: Array(Number(e.target.value)).fill(0) })} required />
-                      </div>
-                      <textarea style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white', minHeight: '80px' }} placeholder="Test Instructions" value={newTest.instructions} onChange={e => setNewTest({ ...newTest, instructions: e.target.value })} required />
-
-                      <label style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>Upload Question Paper (PDF)</label>
-                      <input type="file" id="testPdfFile" style={{ display: 'none' }} onChange={e => setTestFile(e.target.files[0])} accept="application/pdf" />
-                      <button type="button" className="btn" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-glass)', left: 'auto', padding: '0.75rem', color: testFile ? '#10b981' : 'white' }} onClick={() => document.getElementById('testPdfFile').click()}>
-                        {testFile ? `📄 ${testFile.name}` : 'Upload Master Question Paper PDF'}
-                      </button>
-
-                      <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px dashed var(--border-glass)' }}>
-                        <h4 style={{ marginBottom: '1rem', color: '#10b981' }}>Set Answer Key (for Auto-Grading)</h4>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '10px', maxHeight: '250px', overflowY: 'auto', paddingRight: '10px' }}>
-                          {newTest.answerKey.map((ans, idx) => (
-                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'black', padding: '5px 10px', borderRadius: '8px', border: '1px solid var(--border-glass)' }}>
-                              <span style={{ color: 'var(--text-secondary)', width: '30px' }}>Q{idx + 1}</span>
-                              <select style={{ background: 'transparent', color: 'white', border: 'none', outline: 'none', cursor: 'pointer' }} value={ans} onChange={(e) => { const newKey = [...newTest.answerKey]; newKey[idx] = Number(e.target.value); setNewTest({ ...newTest, answerKey: newKey }); }}>
-                                <option style={{ color: 'black' }} value={0}>A</option>
-                                <option style={{ color: 'black' }} value={1}>B</option>
-                                <option style={{ color: 'black' }} value={2}>C</option>
-                                <option style={{ color: 'black' }} value={3}>D</option>
-                              </select>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <button type="submit" className="btn btn-primary" disabled={submitting || !testFile} style={{ background: '#f59e0b', padding: '1rem' }}>{submitting ? 'Creating...' : `Publish Master Test (${newTest.questionsCount} Qs) ⚡`}</button>
-                    </form>
-                  </div>
-
-                  <div className="panel" style={{ gridColumn: '1 / -1' }}>
-                    <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                      Admin controls for content management are active above. Use the Students and Attendance tabs in the sidebar for user management.
+                    {/* Tab Bar */}
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '1.75rem', background: 'rgba(255,255,255,0.03)', padding: '6px', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      {AP_TABS.map(t => (
+                        <button key={t.id} onClick={() => setAdminTab(t.id)}
+                          style={{ flex: 1, padding: '0.7rem 0.5rem', borderRadius: '12px', border: 'none', cursor: 'pointer', fontWeight: '700', fontSize: '0.82rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', transition: 'all 0.2s',
+                            background: adminTab === t.id ? t.color : 'transparent',
+                            color: adminTab === t.id ? (t.id === 'assignment' ? '#052e16' : t.id === 'test' ? '#451a03' : '#0c1a2e') : '#64748b'
+                          }}>
+                          <span style={{ fontSize: '1.1rem' }}>{t.emoji}</span>
+                          <span>{t.label}</span>
+                        </button>
+                      ))}
                     </div>
-                  </div>
 
-                </div>
-              )}
+                    {/* ── STUDY MATERIAL ── */}
+                    {adminTab === 'material' && (
+                      <div style={{ background: 'rgba(56,189,248,0.04)', border: '1.5px solid rgba(56,189,248,0.15)', borderRadius: '24px', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.25rem' }}>
+                          <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: 'rgba(56,189,248,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>📚</div>
+                          <div>
+                            <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: '800', color: '#f8fafc' }}>Upload Study Material</h3>
+                            <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b' }}>PDF, Notes, Images or Link</p>
+                          </div>
+                        </div>
+                        <form onSubmit={handleAddNote} style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+                          <input style={inputStyle} placeholder="Title (e.g. Physics Chapter 4)" value={newNote.title} onChange={e => setNewNote({ ...newNote, title: e.target.value })} required />
+                          <input style={inputStyle} placeholder="Subject / Tag (e.g. Physics)" value={newNote.subject} onChange={e => setNewNote({ ...newNote, subject: e.target.value })} required />
+
+                          {/* File Upload Drop Area */}
+                          <input type="file" id="noteFile" style={{ display: 'none' }} onChange={e => setNoteFile(e.target.files[0])} />
+                          <div onClick={() => document.getElementById('noteFile').click()}
+                            style={{ border: `2px dashed ${noteFile ? '#10b981' : 'rgba(56,189,248,0.3)'}`, borderRadius: '16px', padding: '1.5rem', textAlign: 'center', cursor: 'pointer', background: noteFile ? 'rgba(16,185,129,0.06)' : 'rgba(56,189,248,0.03)', transition: '0.2s' }}>
+                            <div style={{ fontSize: '1.8rem', marginBottom: '6px' }}>{noteFile ? '✅' : '📂'}</div>
+                            <p style={{ margin: 0, fontWeight: '700', fontSize: '0.88rem', color: noteFile ? '#10b981' : '#38bdf8' }}>
+                              {noteFile ? noteFile.name : 'Tap to choose file'}
+                            </p>
+                            <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: '#475569' }}>PDF, DOC, JPG, PNG supported</p>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.07)' }} />
+                            <span style={{ fontSize: '0.75rem', color: '#475569', fontWeight: '600' }}>OR</span>
+                            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.07)' }} />
+                          </div>
+
+                          <input style={inputStyle} placeholder="Paste a link URL (optional)" value={newNote.link} onChange={e => setNewNote({ ...newNote, link: e.target.value })} />
+
+                          <button type="submit" disabled={submitting} style={{ padding: '1rem', borderRadius: '14px', border: 'none', background: submitting ? '#334155' : 'linear-gradient(135deg,#38bdf8,#0284c7)', color: 'white', fontWeight: '800', fontSize: '1rem', cursor: submitting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                            {submitting ? '⏳ Uploading...' : '🚀 Upload Material'}
+                          </button>
+                        </form>
+                      </div>
+                    )}
+
+                    {/* ── ASSIGNMENT ── */}
+                    {adminTab === 'assignment' && (
+                      <div style={{ background: 'rgba(16,185,129,0.04)', border: '1.5px solid rgba(16,185,129,0.15)', borderRadius: '24px', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.25rem' }}>
+                          <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: 'rgba(16,185,129,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>📝</div>
+                          <div>
+                            <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: '800', color: '#f8fafc' }}>Publish Assignment</h3>
+                            <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b' }}>Set title, deadline & attach file</p>
+                          </div>
+                        </div>
+                        <form onSubmit={handleAddAssignment} style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+                          <input style={{ ...inputStyle, border: '1.5px solid rgba(16,185,129,0.3)' }} placeholder="Assignment Title" value={newAssignment.title} onChange={e => setNewAssignment({ ...newAssignment, title: e.target.value })} required />
+                          <input style={{ ...inputStyle, border: '1.5px solid rgba(16,185,129,0.3)' }} placeholder="Subject" value={newAssignment.subject} onChange={e => setNewAssignment({ ...newAssignment, subject: e.target.value })} required />
+
+                          <div style={{ position: 'relative' }}>
+                            <label style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', display: 'block', marginBottom: '4px' }}>Deadline</label>
+                            <input type="date" style={{ ...inputStyle, border: '1.5px solid rgba(16,185,129,0.3)', colorScheme: 'dark' }} value={newAssignment.deadline} onChange={e => setNewAssignment({ ...newAssignment, deadline: e.target.value })} required />
+                          </div>
+
+                          {/* File Upload */}
+                          <input type="file" id="assignFile" style={{ display: 'none' }} onChange={e => setAssignmentFile(e.target.files[0])} />
+                          <div onClick={() => document.getElementById('assignFile').click()}
+                            style={{ border: `2px dashed ${assignmentFile ? '#10b981' : 'rgba(16,185,129,0.3)'}`, borderRadius: '16px', padding: '1.5rem', textAlign: 'center', cursor: 'pointer', background: assignmentFile ? 'rgba(16,185,129,0.08)' : 'rgba(16,185,129,0.03)', transition: '0.2s' }}>
+                            <div style={{ fontSize: '1.8rem', marginBottom: '6px' }}>{assignmentFile ? '✅' : '📄'}</div>
+                            <p style={{ margin: 0, fontWeight: '700', fontSize: '0.88rem', color: assignmentFile ? '#10b981' : '#34d399' }}>
+                              {assignmentFile ? assignmentFile.name : 'Tap to attach PDF'}
+                            </p>
+                            <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: '#475569' }}>Optional — students can download</p>
+                          </div>
+
+                          <button type="submit" disabled={submitting} style={{ padding: '1rem', borderRadius: '14px', border: 'none', background: submitting ? '#334155' : 'linear-gradient(135deg,#10b981,#059669)', color: 'white', fontWeight: '800', fontSize: '1rem', cursor: submitting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                            {submitting ? '⏳ Publishing...' : '📤 Publish Assignment'}
+                          </button>
+                        </form>
+                      </div>
+                    )}
+
+                    {/* ── TEST ── */}
+                    {adminTab === 'test' && (
+                      <div style={{ background: 'rgba(245,158,11,0.04)', border: '1.5px solid rgba(245,158,11,0.15)', borderRadius: '24px', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.25rem' }}>
+                          <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: 'rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>⚡</div>
+                          <div>
+                            <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: '800', color: '#f8fafc' }}>Create Test</h3>
+                            <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b' }}>Upload PDF & set answer key</p>
+                          </div>
+                        </div>
+                        <form onSubmit={handleAddTest} style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+                          <input style={{ ...inputStyle, border: '1.5px solid rgba(245,158,11,0.3)' }} placeholder="Test Title (e.g. Chapter 4 Quiz)" value={newTest.title} onChange={e => setNewTest({ ...newTest, title: e.target.value })} required />
+                          <input style={{ ...inputStyle, border: '1.5px solid rgba(245,158,11,0.3)' }} placeholder="Subject (e.g. Physics)" value={newTest.subject} onChange={e => setNewTest({ ...newTest, subject: e.target.value })} required />
+
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+                            <div>
+                              <label style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '600', display: 'block', marginBottom: '4px' }}>Duration (min)</label>
+                              <input type="number" style={{ ...inputStyle, border: '1.5px solid rgba(245,158,11,0.3)', padding: '0.75rem' }} placeholder="60" value={newTest.durationMinutes} onChange={e => setNewTest({ ...newTest, durationMinutes: Number(e.target.value) })} required />
+                            </div>
+                            <div>
+                              <label style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '600', display: 'block', marginBottom: '4px' }}>–ve Mark</label>
+                              <input type="number" step="0.01" style={{ ...inputStyle, border: '1.5px solid rgba(245,158,11,0.3)', padding: '0.75rem' }} placeholder="0.25" value={newTest.negativeMark} onChange={e => setNewTest({ ...newTest, negativeMark: Number(e.target.value) })} required />
+                            </div>
+                            <div>
+                              <label style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '600', display: 'block', marginBottom: '4px' }}>Questions</label>
+                              <input type="number" style={{ ...inputStyle, border: '1.5px solid rgba(245,158,11,0.3)', padding: '0.75rem' }} placeholder="50" value={newTest.questionsCount} onChange={e => setNewTest({ ...newTest, questionsCount: Number(e.target.value), answerKey: Array(Number(e.target.value)).fill(0) })} required />
+                            </div>
+                          </div>
+
+                          <textarea style={{ ...inputStyle, border: '1.5px solid rgba(245,158,11,0.3)', minHeight: '90px', resize: 'vertical', fontFamily: 'inherit' }} placeholder="Test Instructions (rules, marking scheme...)" value={newTest.instructions} onChange={e => setNewTest({ ...newTest, instructions: e.target.value })} required />
+
+                          {/* PDF Upload */}
+                          <input type="file" id="testPdfFile" style={{ display: 'none' }} onChange={e => setTestFile(e.target.files[0])} accept="application/pdf" />
+                          <div onClick={() => document.getElementById('testPdfFile').click()}
+                            style={{ border: `2px dashed ${testFile ? '#10b981' : 'rgba(245,158,11,0.4)'}`, borderRadius: '16px', padding: '1.5rem', textAlign: 'center', cursor: 'pointer', background: testFile ? 'rgba(16,185,129,0.06)' : 'rgba(245,158,11,0.03)', transition: '0.2s' }}>
+                            <div style={{ fontSize: '1.8rem', marginBottom: '6px' }}>{testFile ? '✅' : '📋'}</div>
+                            <p style={{ margin: 0, fontWeight: '700', fontSize: '0.88rem', color: testFile ? '#10b981' : '#fbbf24' }}>
+                              {testFile ? testFile.name : 'Tap to upload Question Paper PDF'}
+                            </p>
+                            <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: '#475569' }}>Required — PDF only</p>
+                          </div>
+
+                          {/* Answer Key */}
+                          {newTest.questionsCount > 0 && (
+                            <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '16px', padding: '1.25rem', border: '1px solid rgba(245,158,11,0.15)' }}>
+                              <h4 style={{ margin: '0 0 1rem', color: '#fbbf24', fontSize: '0.9rem', fontWeight: '700' }}>✅ Set Answer Key ({newTest.questionsCount} Qs)</h4>
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: '8px', maxHeight: '220px', overflowY: 'auto' }}>
+                                {newTest.answerKey.map((ans, idx) => (
+                                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.05)', padding: '7px 10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.07)' }}>
+                                    <span style={{ color: '#94a3b8', fontSize: '0.78rem', minWidth: '28px', fontWeight: '600' }}>Q{idx + 1}</span>
+                                    <select style={{ background: 'transparent', color: '#fbbf24', border: 'none', outline: 'none', cursor: 'pointer', fontWeight: '800', fontSize: '0.9rem', flex: 1 }} value={ans} onChange={(e) => { const k = [...newTest.answerKey]; k[idx] = Number(e.target.value); setNewTest({ ...newTest, answerKey: k }); }}>
+                                      <option style={{ background: '#0f172a', color: 'white' }} value={0}>A</option>
+                                      <option style={{ background: '#0f172a', color: 'white' }} value={1}>B</option>
+                                      <option style={{ background: '#0f172a', color: 'white' }} value={2}>C</option>
+                                      <option style={{ background: '#0f172a', color: 'white' }} value={3}>D</option>
+                                    </select>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          <button type="submit" disabled={submitting || !testFile} style={{ padding: '1rem', borderRadius: '14px', border: 'none', background: (submitting || !testFile) ? '#334155' : 'linear-gradient(135deg,#f59e0b,#d97706)', color: (submitting || !testFile) ? '#64748b' : '#1c1400', fontWeight: '800', fontSize: '1rem', cursor: (submitting || !testFile) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                            {submitting ? '⏳ Creating...' : `⚡ Publish Test (${newTest.questionsCount} Qs)`}
+                          </button>
+                        </form>
+                      </div>
+                    )}
+
+                  </div>
+                );
+              })()}
+
 
               {activeTab === 'Classes' && (
                 <div className="panel" style={{ overflowX: 'auto', width: '100%' }}>
