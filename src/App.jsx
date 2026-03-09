@@ -601,28 +601,75 @@ function App() {
 
         <section className="content-area">
           {user?.role === 'student' && !user?.isApproved ? (
-            <div className="panel" style={{ textAlign: 'center', padding: '5rem 2rem', margin: '2rem auto', maxWidth: '700px', borderRadius: '24px', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '8px', background: 'linear-gradient(90deg, #f59e0b, #fbbf24)' }}></div>
-              <div style={{ background: 'rgba(245, 158, 11, 0.1)', width: '80px', height: '80px', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: '#f59e0b', transform: 'rotate(10deg)' }}>
-                <svg style={{ width: '40px', height: '40px' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh', padding: '2rem' }}>
+              <div style={{ width: '100%', maxWidth: '520px' }}>
+
+                {/* Status Badge */}
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: '100px', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', color: '#f59e0b', fontSize: '0.78rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                    <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#f59e0b', display: 'inline-block', boxShadow: '0 0 6px #f59e0b', animation: 'pulse 2s infinite' }} />
+                    Verification Pending
+                  </span>
+                </div>
+
+                {/* Icon */}
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+                  <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg width="32" height="32" fill="none" stroke="#f59e0b" strokeWidth="1.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Main Text */}
+                <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+                  <h1 style={{ fontSize: '1.75rem', fontWeight: '800', color: '#f8fafc', marginBottom: '0.75rem', letterSpacing: '-0.02em' }}>
+                    Your account is under review
+                  </h1>
+                  <p style={{ color: '#94a3b8', fontSize: '0.97rem', lineHeight: '1.7', maxWidth: '420px', margin: '0 auto' }}>
+                    Hi <strong style={{ color: '#f8fafc' }}>{user?.name}</strong>, your registration has been received. An admin will verify and activate your account shortly.
+                  </p>
+                </div>
+
+                {/* Steps Card */}
+                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '20px', padding: '1.5rem', marginBottom: '2rem' }}>
+                  <p style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '1.2rem' }}>What happens next?</p>
+
+                  {[
+                    { icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', label: 'Review in progress', sub: 'Admin is reviewing your registration details.', done: false },
+                    { icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', label: 'Account activation', sub: 'Once approved, all features will unlock automatically.', done: false },
+                    { icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z', label: 'Full access granted', sub: 'Access tests, assignments and study materials.', done: false },
+                  ].map((step, i) => (
+                    <div key={i} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', marginBottom: i < 2 ? '1.25rem' : 0 }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                        <svg width="16" height="16" fill="none" stroke="#64748b" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d={step.icon} />
+                        </svg>
+                      </div>
+                      <div>
+                        <p style={{ fontWeight: '600', fontSize: '0.9rem', color: '#e2e8f0', margin: 0, marginBottom: '2px' }}>{step.label}</p>
+                        <p style={{ fontSize: '0.8rem', color: '#64748b', margin: 0, lineHeight: '1.5' }}>{step.sub}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Contact Info */}
+                <div style={{ background: 'rgba(56,189,248,0.04)', border: '1px solid rgba(56,189,248,0.1)', borderRadius: '14px', padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <svg width="18" height="18" fill="none" stroke="#38bdf8" strokeWidth="2" viewBox="0 0 24 24" style={{ flexShrink: 0 }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p style={{ margin: 0, fontSize: '0.82rem', color: '#94a3b8', lineHeight: '1.5' }}>
+                    Need urgent access? Contact <strong style={{ color: '#f8fafc' }}>Tilak Mishra Sir</strong> directly.
+                  </p>
+                </div>
+
+                {/* Logout Button */}
+                <button onClick={logout} style={{ width: '100%', padding: '0.85rem', borderRadius: '12px', background: 'transparent', color: '#64748b', border: '1px solid rgba(255,255,255,0.06)', fontWeight: '600', fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.2s' }}>
+                  Sign out
+                </button>
+
               </div>
-              <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '1.5rem', background: 'linear-gradient(135deg, #fff 0%, #94a3b8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Account Verification <br /> Underway! ⏳</h2>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem', lineHeight: '1.8', marginBottom: '3rem', maxWidth: '500px', margin: '0 auto 3rem' }}>
-                Hello <strong>{user?.name || 'Warrior'}</strong>, we've received your registration for <strong>Exam Cracker Coaching Centre</strong>. Our admins are currently verifying your details.
-              </p>
-              <div style={{ background: 'var(--bg-glass)', padding: '2rem', borderRadius: '16px', border: '1px solid var(--border-glass)', marginBottom: '3rem' }}>
-                <p style={{ margin: 0, fontSize: '1rem', color: 'var(--text-primary)' }}>
-                  <span style={{ display: 'block', fontWeight: 'bold', color: '#f59e0b', marginBottom: '8px' }}>🚀 Next Steps:</span>
-                  1. Sit back and relax! Verification takes about 1-2 hours. <br />
-                  2. Once approved, all library and test features will unlock automatically. <br />
-                  3. For urgent access, please contact <strong>Tilak Mishra Sir</strong>.
-                </p>
-              </div>
-              <button className="btn" onClick={logout} style={{ padding: '1rem 2.5rem', borderRadius: '14px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', fontWeight: '700' }}>
-                Check Status Later
-              </button>
             </div>
           ) : (
             <>

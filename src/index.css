@@ -457,6 +457,20 @@ tr:hover td {
   color: var(--text-secondary);
 }
 
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
