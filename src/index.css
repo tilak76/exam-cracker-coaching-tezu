@@ -38,6 +38,8 @@ body {
 #root {
   display: flex;
   height: 100vh;
+  position: relative;
+  overflow: hidden;
 }
 
 /* Sidebar */
@@ -50,8 +52,9 @@ body {
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
-  transition: transform 0.3s ease;
-  z-index: 100;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  height: 100vh;
 }
 
 .brand {
@@ -451,5 +454,83 @@ tr:hover td {
 @media (max-width: 1024px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: -280px;
+    width: 280px;
+    box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .sidebar-overlay.active {
+    display: block;
+  }
+
+  .topbar {
+    padding: 0 1.25rem;
+    height: 70px;
+  }
+
+  .search-bar {
+    display: none;
+    /* Hide search on mobile to save space, or make it a popup */
+  }
+
+  .content-area {
+    padding: 1.25rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .stat-card {
+    padding: 1.25rem;
+  }
+
+  .menu-toggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+  }
+
+  .panel {
+    padding: 1.25rem;
+  }
+
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .panel-header .btn {
+    width: 100%;
+    text-align: center;
   }
 }
