@@ -588,11 +588,11 @@ function App() {
                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '16px', lineHeight: '1.6', minHeight: '40px' }}>APSSB / LDC / UDC / BANKING / POLICE / SI / SSC CHSL / CGL / SSC GD / AGNIVEER / MTS</p>
 
                         <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.25rem', borderRadius: '16px', marginBottom: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                          <div style={{ fontWeight: '800', color: 'white', marginBottom: '10px', fontSize: '0.9rem' }}>Subjects Covered:</div>
+                          <div style={{ fontWeight: '800', color: 'white', marginBottom: '10px', fontSize: '0.9rem' }}>Highlights & Subjects:</div>
                           <ul style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', paddingLeft: '20px', margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                            <li>Elementary Mathematics (Quant)</li>
-                            <li>Reasoning</li>
-                            <li>General Knowledge (Current Affairs)</li>
+                            <li><span style={{ color: '#f97316', fontWeight: 'bold' }}>🏫 100% Offline Classes</span> (Flexible Timings)</li>
+                            <li>📖 Maths, Reasoning, GK & Current Affairs</li>
+                            <li>📝 Weekly & Monthly Mock Tests</li>
                           </ul>
                         </div>
 
@@ -613,11 +613,11 @@ function App() {
                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '16px', lineHeight: '1.6', minHeight: '40px' }}>For school/college students, job seekers, and employees focusing on fluency & communication.</p>
 
                         <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.25rem', borderRadius: '16px', marginBottom: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                          <div style={{ fontWeight: '800', color: 'white', marginBottom: '10px', fontSize: '0.9rem' }}>Main Focus:</div>
+                          <div style={{ fontWeight: '800', color: 'white', marginBottom: '10px', fontSize: '0.9rem' }}>Highlights:</div>
                           <ul style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', paddingLeft: '20px', margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                            <li>Grammar (Tenses, Parts of speech)</li>
-                            <li>Fluency & Vocabulary</li>
-                            <li>Presentation & Interview Prep</li>
+                            <li><span style={{ color: '#0ea5e9', fontWeight: 'bold' }}>🏫 100% Offline Classes</span> (Flexible Timings)</li>
+                            <li>🗣️ Grammar, Fluency & Vocabulary</li>
+                            <li>🎯 Presentation & Interview Prep</li>
                           </ul>
                         </div>
 
