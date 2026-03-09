@@ -574,6 +574,64 @@ function App() {
                     )}
                   </div>
 
+                  <div style={{ marginBottom: '3.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                      <h2 style={{ fontSize: '1.8rem', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '10px' }}><span style={{ color: '#f59e0b' }}>🔥</span> Explore Premium Courses</h2>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
+                      {/* Course 1 */}
+                      <div className="course-card" style={{ background: 'linear-gradient(135deg, rgba(234, 88, 12, 0.1) 0%, rgba(15, 23, 42, 0.6) 100%)', border: '1px solid rgba(234, 88, 12, 0.2)', borderRadius: '24px', padding: '2rem', position: 'relative', overflow: 'hidden', backdropFilter: 'blur(10px)', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ position: 'absolute', top: 0, right: 0, background: 'linear-gradient(90deg, #ea580c, #f97316)', color: 'white', padding: '6px 16px', borderBottomLeftRadius: '16px', fontWeight: '800', fontSize: '0.8rem', letterSpacing: '1px' }}>NEW BATCH SOON!</div>
+                        <h3 style={{ color: '#fdba74', textTransform: 'uppercase', letterSpacing: '1.5px', fontSize: '0.8rem', fontWeight: '800', marginBottom: '8px' }}>Exam Cracker</h3>
+                        <h2 style={{ fontSize: '1.6rem', fontWeight: '900', color: 'white', marginBottom: '12px', lineHeight: '1.2' }}>Coaching for Govt. Jobs</h2>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '16px', lineHeight: '1.6', minHeight: '40px' }}>APSSB / LDC / UDC / BANKING / POLICE / SI / SSC CHSL / CGL / SSC GD / AGNIVEER / MTS</p>
+
+                        <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.25rem', borderRadius: '16px', marginBottom: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                          <div style={{ fontWeight: '800', color: 'white', marginBottom: '10px', fontSize: '0.9rem' }}>Subjects Covered:</div>
+                          <ul style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', paddingLeft: '20px', margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <li>Elementary Mathematics (Quant)</li>
+                            <li>Reasoning</li>
+                            <li>General Knowledge (Current Affairs)</li>
+                          </ul>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto' }}>
+                          <div>
+                            <span style={{ fontSize: '1.8rem', fontWeight: '900', color: 'white', letterSpacing: '-1px' }}>₹2500</span>
+                            <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: '600' }}>/month</span>
+                          </div>
+                          <button onClick={() => window.open('https://wa.me/919958776101?text=Hi!%20I%20want%20to%20join%20the%20Govt.%20Jobs%20Coaching%20batch.', '_blank')} className="btn-whatsapp" style={{ background: 'linear-gradient(90deg, #ea580c, #f97316)', color: 'white', border: 'none', padding: '12px 20px', borderRadius: '14px', fontWeight: '800', cursor: 'pointer', boxShadow: '0 8px 20px rgba(234, 88, 12, 0.4)' }}>Join Now 💬</button>
+                        </div>
+                      </div>
+
+                      {/* Course 2 */}
+                      <div className="course-card" style={{ background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(15, 23, 42, 0.6) 100%)', border: '1px solid rgba(14, 165, 233, 0.2)', borderRadius: '24px', padding: '2rem', position: 'relative', overflow: 'hidden', backdropFilter: 'blur(10px)', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ position: 'absolute', top: 0, right: 0, background: 'linear-gradient(90deg, #0284c7, #0ea5e9)', color: 'white', padding: '6px 16px', borderBottomLeftRadius: '16px', fontWeight: '800', fontSize: '0.8rem', letterSpacing: '1px' }}>NEW BATCH SOON!</div>
+                        <h3 style={{ color: '#7dd3fc', textTransform: 'uppercase', letterSpacing: '1.5px', fontSize: '0.8rem', fontWeight: '800', marginBottom: '8px' }}>Skill Development</h3>
+                        <h2 style={{ fontSize: '1.6rem', fontWeight: '900', color: 'white', marginBottom: '12px', lineHeight: '1.2' }}>Spoken English & Grammar</h2>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '16px', lineHeight: '1.6', minHeight: '40px' }}>For school/college students, job seekers, and employees focusing on fluency & communication.</p>
+
+                        <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.25rem', borderRadius: '16px', marginBottom: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                          <div style={{ fontWeight: '800', color: 'white', marginBottom: '10px', fontSize: '0.9rem' }}>Main Focus:</div>
+                          <ul style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', paddingLeft: '20px', margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <li>Grammar (Tenses, Parts of speech)</li>
+                            <li>Fluency & Vocabulary</li>
+                            <li>Presentation & Interview Prep</li>
+                          </ul>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto' }}>
+                          <div>
+                            <span style={{ fontSize: '1.8rem', fontWeight: '900', color: 'white', letterSpacing: '-1px' }}>₹1000</span>
+                            <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: '600' }}>/month</span>
+                          </div>
+                          <button onClick={() => window.open('https://wa.me/919958776101?text=Hi!%20I%20want%20to%20join%20the%20Spoken%20English%20batch.', '_blank')} className="btn-whatsapp" style={{ background: 'linear-gradient(90deg, #0284c7, #0ea5e9)', color: 'white', border: 'none', padding: '12px 20px', borderRadius: '14px', fontWeight: '800', cursor: 'pointer', boxShadow: '0 8px 20px rgba(14, 165, 233, 0.4)' }}>Join Now 💬</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {!user && (
                     <div style={{ background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(129, 140, 248, 0.1) 100%)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '2.5rem', borderRadius: '24px', marginTop: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backdropFilter: 'blur(10px)', animation: 'slide-in 0.5s ease' }}>
                       <div style={{ maxWidth: '60%' }}>
