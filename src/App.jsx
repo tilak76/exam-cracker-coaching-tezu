@@ -578,12 +578,12 @@ function App() {
                   {!user && (
                     <div style={{ background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(129, 140, 248, 0.1) 100%)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '2.5rem', borderRadius: '24px', marginTop: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backdropFilter: 'blur(10px)', animation: 'slide-in 0.5s ease' }}>
                       <div style={{ maxWidth: '60%' }}>
-                        <h3 style={{ fontSize: '1.75rem', fontWeight: '900', color: 'white', marginBottom: '8px' }}>Join the Exam Cracker Elite! 🎯</h3>
-                        <p style={{ margin: 0, color: '#94a3b8', fontSize: '1rem', lineHeight: '1.6' }}>Create a free account to track your progress, access premium study material, and solve test series.</p>
+                        <h3 style={{ fontSize: '1.75rem', fontWeight: '900', color: 'white', marginBottom: '8px' }}>Admin & Student Panel</h3>
+                        <p style={{ margin: 0, color: '#94a3b8', fontSize: '1rem', lineHeight: '1.6' }}>Please login or register to access the coaching dashboard.</p>
                       </div>
                       <div style={{ display: 'flex', gap: '1rem' }}>
                         <button className="btn" onClick={() => { setIsLoginView(true); setShowAuthModal(true); }} style={{ padding: '1rem 2rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', fontWeight: '700', borderRadius: '14px' }}>Login</button>
-                        <button className="btn btn-primary" onClick={() => { setIsLoginView(false); setShowAuthModal(true); }} style={{ padding: '1rem 2.5rem', fontWeight: '900', borderRadius: '14px', boxShadow: '0 10px 30px rgba(56, 189, 248, 0.3)' }}>Join Now</button>
+                        <button className="btn btn-primary" onClick={() => { setIsLoginView(false); setShowAuthModal(true); }} style={{ padding: '1rem 2.5rem', fontWeight: '900', borderRadius: '14px', boxShadow: '0 10px 30px rgba(56, 189, 248, 0.3)' }}>Register</button>
                       </div>
                     </div>
                   )}
