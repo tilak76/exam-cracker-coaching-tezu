@@ -1318,61 +1318,30 @@ function App() {
 
       {/* Refined Welcome Popup */}
       {showWelcome && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 11000, display: 'flex', alignItems: 'center',
-          justifyContent: 'center', padding: '20px', background: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(10px)'
-        }}>
-          <div style={{
-            background: '#1a1c1e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '28px',
-            width: '100%', maxWidth: '400px', position: 'relative', overflow: 'hidden',
-            boxShadow: '0 40px 100px rgba(0,0,0,0.6)', animation: 'slide-in 0.4s cubic-bezier(0.1, 1, 0.3, 1)', padding: '30px 25px'
-          }}>
-            <div style={{ height: '5px', width: '100%', position: 'absolute', top: 0, left: 0, background: 'var(--accent-gradient)' }}></div>
-
-            <div style={{
-              width: '60px', height: '60px', background: 'var(--accent-gradient)', borderRadius: '18px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 15px',
-              boxShadow: '0 8px 16px rgba(56, 189, 248, 0.2)'
-            }}>
-              <svg style={{ width: '28px', height: '28px', color: 'white' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-              </svg>
-            </div>
-
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'white', marginBottom: '8px', textAlign: 'center' }}>
-              Welcome back, Warrior! 🎯
-            </h2>
-
-            <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.5', marginBottom: '25px', textAlign: 'center' }}>
-              Happy to see you again! Your coaching dashboard is ready. Let's start preparing for your success.
+        <div className="modal-overlay">
+          <div className="modal-content panel" style={{ textAlign: 'center', padding: '3.5rem', background: 'rgba(15, 23, 42, 0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '32px' }}>
+            <div style={{ fontSize: '4rem', marginBottom: '1.5rem', animation: 'bounce 2s infinite' }}>🎯</div>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: '900', color: 'white', marginBottom: '1rem', letterSpacing: '-0.03em' }}>{welcomeText}</h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '2.5rem', lineHeight: '1.6' }}>
+              Your journey to excellence continues. All your study materials and tests are ready.
             </p>
-
             <button
               onClick={() => setShowWelcome(false)}
-              style={{
-                width: '100%', background: 'white', color: 'black', fontWeight: '700', padding: '16px',
-                borderRadius: '16px', border: 'none', cursor: 'pointer', transition: '0.2s', fontSize: '1rem'
-              }}
-              onMouseEnter={(e) => e.target.style.background = '#e2e8f0'}
-              onMouseLeave={(e) => e.target.style.background = 'white'}
+              className="btn btn-primary"
+              style={{ width: '100%', padding: '1.25rem', borderRadius: '16px', fontSize: '1.1rem', fontWeight: '800' }}
             >
               Enter Dashboard
             </button>
-
-            <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '10px', fontWeight: '700', letterSpacing: '0.1em', color: '#64748b' }}>
-              EXAM CRACKER COACHING CENTRE
-            </div>
           </div>
         </div>
       )}
 
       {/* Professional Auth Modal */}
       {showAuthModal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 12000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.9)', backdropFilter: 'blur(15px)' }} onClick={() => setShowAuthModal(false)}></div>
-          <div className="panel" style={{ position: 'relative', width: '100%', maxWidth: '440px', padding: '3rem', boxShadow: '0 60px 120px rgba(0,0,0,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '32px', background: 'var(--bg-primary)', overflow: 'hidden' }}>
+        <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) setShowAuthModal(false); }}>
+          <div className="modal-content panel" style={{ padding: '3rem', position: 'relative', background: 'var(--bg-primary)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '32px', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '6px', background: 'var(--accent-gradient)' }}></div>
-            <button onClick={() => setShowAuthModal(false)} style={{ position: 'absolute', top: '24px', right: '24px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', color: 'var(--text-secondary)', cursor: 'pointer', padding: '8px', borderRadius: '12px', transition: '0.2s' }}>
+            <button onClick={() => setShowAuthModal(false)} style={{ position: 'absolute', top: '24px', right: '24px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', color: 'var(--text-secondary)', cursor: 'pointer', padding: '8px', borderRadius: '12px' }}>
               <svg style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
 
@@ -1389,14 +1358,14 @@ function App() {
             <form onSubmit={async (e) => { e.preventDefault(); await handleAuth(e); if (!authError) setShowAuthModal(false); }} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {!isLoginView && (
                 <div style={{ position: 'relative' }}>
-                  <input style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '16px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white', outline: 'none', transition: '0.2s' }} placeholder="Your Full Name" value={authForm.name} onChange={e => setAuthForm({ ...authForm, name: e.target.value })} required />
+                  <input style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '16px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white', outline: 'none' }} placeholder="Your Full Name" value={authForm.name} onChange={e => setAuthForm({ ...authForm, name: e.target.value })} required />
                 </div>
               )}
               <div>
-                <input type="email" style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '16px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white', outline: 'none', transition: '0.2s' }} placeholder="Email address" value={authForm.email} onChange={e => setAuthForm({ ...authForm, email: e.target.value })} required />
+                <input type="email" style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '16px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white', outline: 'none' }} placeholder="Email address" value={authForm.email} onChange={e => setAuthForm({ ...authForm, email: e.target.value })} required />
               </div>
               <div>
-                <input type="password" style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '16px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white', outline: 'none', transition: '0.2s' }} placeholder="Password" value={authForm.password} onChange={e => setAuthForm({ ...authForm, password: e.target.value })} required />
+                <input type="password" style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '16px', border: '1px solid var(--border-glass)', background: 'var(--bg-glass)', color: 'white', outline: 'none' }} placeholder="Password" value={authForm.password} onChange={e => setAuthForm({ ...authForm, password: e.target.value })} required />
               </div>
               <button type="submit" className="btn btn-primary" style={{ padding: '1.1rem', borderRadius: '16px', fontWeight: '800', fontSize: '1.1rem', marginTop: '0.5rem' }} disabled={loading}>
                 {loading ? 'Authenticating...' : (isLoginView ? 'Sign In' : 'Create Profile')}

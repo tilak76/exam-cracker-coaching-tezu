@@ -6,7 +6,7 @@
             "destination": "/api/index.cjs"
         },
         {
-            "source": "/(.*)",
+            "source": "/((?!.*\\.(?:js|css|json|png|jpg|jpeg|gif|svg|ico|woff2?|ttf|otf)$|api/).*)",
             "destination": "/index.html"
         }
     ]
