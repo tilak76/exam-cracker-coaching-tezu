@@ -980,49 +980,85 @@ function App() {
               )}
 
               {activeTab === 'Assignments' && (
-                <div className="panel" style={{ overflowX: 'auto', width: '100%' }}>
-                  <div className="panel-header"><h3 className="panel-title">Your Assignments</h3></div>
-                  <table style={{ width: '100%' }}>
-                    <thead><tr><th>Title</th><th>Subject</th><th>Deadline</th>{user?.role === 'admin' ? <th>Action</th> : <th>Status</th>}</tr></thead>
-                    <tbody>
-                      {assignments.map((a, idx) => (
-                        <tr key={idx}>
-                          <td>
-                            <strong>{a.title}</strong>
-                            {a.fileUrl && <div style={{ fontSize: '0.8rem', marginTop: '5px' }}><a href={a.fileUrl} target="_blank" rel="noreferrer" style={{ color: '#38bdf8' }}>📄 View Attached Document</a></div>}
-                          </td>
-                          <td>{a.subject}</td>
-                          <td>{a.deadline}</td>
-                          {user?.role === 'admin' ? (
-                            <td><button onClick={() => handleDeleteAssignment(a._id)} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer' }}>Delete</button></td>
-                          ) : (
-                            <td><button className="btn btn-primary" onClick={() => alert('Assignment Submitted!')} style={{ padding: '5px 10px' }}>Submit Task</button></td>
-                          )}
-                        </tr>
-                      ))}
-                      {assignments.length === 0 && <tr><td colSpan="4" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No assignments available.</td></tr>}
-                    </tbody>
-                  </table>
+                <div className="panel" style={{ width: '100%' }}>
+                  <div className="panel-header">
+                    <h3 className="panel-title">📝 Your Assignments</h3>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.05)', padding: '4px 10px', borderRadius: '8px' }}>
+                      {user?.isApproved ? 'Full Access' : '2 Free | Rest Locked'}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                    {[...assignments].reverse().map((a, idx) => {
+                      const isLocked = user?.role === 'student' && !user?.isApproved && idx >= 2;
+                      return (
+                        <div key={idx} style={{ background: isLocked ? 'rgba(255,255,255,0.02)' : 'var(--bg-glass)', padding: '1.1rem 1.25rem', borderRadius: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: `1px solid ${isLocked ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.06)'}`, opacity: isLocked ? 0.65 : 1, transition: '0.2s' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: isLocked ? 'rgba(255,255,255,0.04)' : 'rgba(16,185,129,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              {isLocked
+                                ? <svg width="16" height="16" fill="#64748b" viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9z" /></svg>
+                                : <svg width="16" height="16" fill="#10b981" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /></svg>}
+                            </div>
+                            <div>
+                              <p style={{ fontWeight: '700', margin: 0, fontSize: '0.95rem', color: isLocked ? '#64748b' : 'white' }}>{a.title}</p>
+                              <small style={{ color: '#64748b', fontSize: '0.78rem' }}>{a.subject} • Due: <span style={{ color: isLocked ? '#64748b' : '#f59e0b' }}>{a.deadline}</span></small>
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexShrink: 0 }}>
+                            {isLocked ? (
+                              <button onClick={() => showToast('Verify your account to access all assignments.', 'warning')} style={{ padding: '6px 14px', fontSize: '0.78rem', fontWeight: '700', borderRadius: '8px', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', color: '#64748b', cursor: 'pointer' }}>🔒 Locked</button>
+                            ) : (
+                              <>
+                                {a.fileUrl && <a href={a.fileUrl} target="_blank" rel="noreferrer" style={{ padding: '6px 14px', fontSize: '0.78rem', fontWeight: '700', borderRadius: '8px', background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.2)', color: '#38bdf8', textDecoration: 'none' }}>View</a>}
+                                {user?.role === 'admin' && <button onClick={() => handleDeleteAssignment(a._id)} style={{ padding: '6px 10px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', borderRadius: '8px', cursor: 'pointer', fontSize: '0.78rem' }}>Delete</button>}
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {assignments.length === 0 && <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px dashed var(--border-glass)' }}>📭 No assignments yet.</div>}
+                  </div>
                 </div>
               )}
 
               {activeTab === 'Study Material' && (
                 <div className="panel" style={{ width: '100%' }}>
-                  <div className="panel-header"><h3 className="panel-title">Uploaded Study Materials</h3></div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {notes.map((n, idx) => (
-                      <div key={idx} style={{ background: 'var(--bg-glass)', padding: '1rem', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                          <h4 style={{ marginBottom: '5px' }}>{n.title}</h4>
-                          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '5px' }}>{n.subject}</p>
-                          {n.link && <a href={n.link} target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'none', fontSize: '0.9rem' }}>📂 View / Download Material</a>}
+                  <div className="panel-header">
+                    <h3 className="panel-title">📚 Study Materials</h3>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.05)', padding: '4px 10px', borderRadius: '8px' }}>
+                      {user?.isApproved ? 'Full Access' : '2 Free | Rest Locked'}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                    {[...notes].reverse().map((n, idx) => {
+                      const isLocked = user?.role === 'student' && !user?.isApproved && idx >= 2;
+                      return (
+                        <div key={idx} style={{ background: isLocked ? 'rgba(255,255,255,0.02)' : 'var(--bg-glass)', padding: '1.1rem 1.25rem', borderRadius: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: `1px solid ${isLocked ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.06)'}`, opacity: isLocked ? 0.65 : 1, transition: '0.2s' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: isLocked ? 'rgba(255,255,255,0.04)' : 'rgba(56,189,248,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              {isLocked
+                                ? <svg width="16" height="16" fill="#64748b" viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9z" /></svg>
+                                : <span style={{ fontSize: '1.1rem' }}>📄</span>}
+                            </div>
+                            <div>
+                              <p style={{ fontWeight: '700', margin: 0, fontSize: '0.95rem', color: isLocked ? '#64748b' : 'white' }}>{n.title}</p>
+                              <small style={{ color: '#64748b', fontSize: '0.78rem' }}>{n.subject}</small>
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexShrink: 0 }}>
+                            {isLocked ? (
+                              <button onClick={() => showToast('Verify your account to access all study materials.', 'warning')} style={{ padding: '6px 14px', fontSize: '0.78rem', fontWeight: '700', borderRadius: '8px', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', color: '#64748b', cursor: 'pointer' }}>🔒 Locked</button>
+                            ) : (
+                              <>
+                                {(n.link || n.fileUrl) && <a href={n.link || n.fileUrl} target="_blank" rel="noreferrer" style={{ padding: '6px 14px', fontSize: '0.78rem', fontWeight: '700', borderRadius: '8px', background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.2)', color: '#38bdf8', textDecoration: 'none' }}>📂 View</a>}
+                                {user?.role === 'admin' && <button onClick={() => handleDeleteNote(n._id)} style={{ padding: '6px 10px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', borderRadius: '8px', cursor: 'pointer', fontSize: '0.78rem' }}>Delete</button>}
+                              </>
+                            )}
+                          </div>
                         </div>
-                        {user?.role === 'admin' && (
-                          <button onClick={() => handleDeleteNote(n._id)} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer' }}>Delete</button>
-                        )}
-                      </div>
-                    ))}
-                    {notes.length === 0 && <p style={{ color: 'var(--text-secondary)' }}>No materials uploaded yet.</p>}
+                      );
+                    })}
+                    {notes.length === 0 && <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px dashed var(--border-glass)' }}>📚 No materials uploaded yet.</div>}
                   </div>
                 </div>
               )}
@@ -1077,51 +1113,58 @@ function App() {
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
-                          {[...tests].reverse().filter(t => testFilter === 'All' || t.subject.includes(testFilter)).map((t, idx) => (
-                            <div key={idx} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-glass)', borderRadius: '20px', overflow: 'hidden', transition: 'all 0.3s ease' }} className="test-series-card">
-                              <div style={{ height: '6px', background: completedTests.includes(t._id.toString()) ? '#10b981' : 'var(--accent-gradient)' }}></div>
-                              <div style={{ padding: '1.5rem' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', alignItems: 'center' }}>
-                                  <span style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: '#38bdf8', background: 'rgba(56, 189, 248, 0.1)', padding: '4px 10px', borderRadius: '6px' }}>{t.subject}</span>
-                                  {completedTests.includes(t._id.toString()) ? (
-                                    <span style={{ color: '#10b981', fontSize: '0.75rem', fontWeight: 'bold' }}>✅ COMPLETED</span>
-                                  ) : (
-                                    <span style={{ color: '#f59e0b', fontSize: '0.75rem', fontWeight: 'bold' }}>🕒 NEW</span>
-                                  )}
-                                </div>
-                                <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1.25rem', lineHeight: '1.4' }}>{t.title}</h3>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem', background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '12px' }}>
-                                  <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                                    <p style={{ color: 'white', fontWeight: 'bold' }}>{t.durationMinutes} Mins</p>
-                                    <span>Duration</span>
+                          {[...tests].reverse().filter(t => testFilter === 'All' || t.subject.includes(testFilter)).map((t, idx) => {
+                            const isLocked = user?.role === 'student' && !user?.isApproved && idx >= 2;
+                            return (
+                              <div key={idx} style={{ background: isLocked ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.03)', border: `1px solid ${isLocked ? 'rgba(255,255,255,0.04)' : 'var(--border-glass)'}`, borderRadius: '20px', overflow: 'hidden', transition: 'all 0.3s ease', opacity: isLocked ? 0.65 : 1 }} className="test-series-card">
+                                <div style={{ height: '6px', background: isLocked ? '#334155' : (completedTests.includes(t._id.toString()) ? '#10b981' : 'var(--accent-gradient)') }}></div>
+                                <div style={{ padding: '1.5rem' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', alignItems: 'center' }}>
+                                    <span style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: isLocked ? '#64748b' : '#38bdf8', background: isLocked ? 'rgba(255,255,255,0.04)' : 'rgba(56, 189, 248, 0.1)', padding: '4px 10px', borderRadius: '6px' }}>{t.subject}</span>
+                                    {isLocked ? (
+                                      <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 'bold' }}>🔒 LOCKED</span>
+                                    ) : completedTests.includes(t._id.toString()) ? (
+                                      <span style={{ color: '#10b981', fontSize: '0.75rem', fontWeight: 'bold' }}>✅ COMPLETED</span>
+                                    ) : (
+                                      <span style={{ color: '#f59e0b', fontSize: '0.75rem', fontWeight: 'bold' }}>🕒 NEW</span>
+                                    )}
                                   </div>
-                                  <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                                    <p style={{ color: 'white', fontWeight: 'bold' }}>{t.questionsCount}</p>
-                                    <span>Questions</span>
+                                  <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1.25rem', lineHeight: '1.4', color: isLocked ? '#64748b' : 'white' }}>{t.title}</h3>
+                                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem', background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '12px' }}>
+                                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                                      <p style={{ color: isLocked ? '#64748b' : 'white', fontWeight: 'bold' }}>{t.durationMinutes} Mins</p>
+                                      <span>Duration</span>
+                                    </div>
+                                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                                      <p style={{ color: isLocked ? '#64748b' : 'white', fontWeight: 'bold' }}>{t.questionsCount}</p>
+                                      <span>Questions</span>
+                                    </div>
                                   </div>
-                                </div>
-                                <div style={{ display: 'flex', gap: '10px' }}>
-                                  {user?.role === 'admin' ? (
-                                    <>
-                                      <button className="btn btn-primary" onClick={() => startTest(t)} style={{ flex: 1 }}>Preview 👁</button>
-                                      <button onClick={() => handleDeleteTest(t._id)} style={{ padding: '10px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '10px' }}>🗑</button>
-                                    </>
-                                  ) : (
-                                    <>
-                                      {completedTests.includes(t._id.toString()) ? (
-                                        <>
-                                          <button className="btn" onClick={() => startTest(t)} style={{ flex: 1, background: 'rgba(16, 185, 129, 0.1)', border: '1px solid #10b981', color: '#10b981', fontWeight: 'bold' }}>Retake (Practice)</button>
-                                          <button className="btn" onClick={() => handleViewLeaderboard(t)} style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid #f59e0b', color: '#f59e0b' }}>🏆 Ranking</button>
-                                        </>
-                                      ) : (
-                                        <button className="btn btn-primary" onClick={() => startTest(t)} style={{ flex: 1, fontWeight: 'bold', padding: '0.85rem' }}>Start Exam Now</button>
-                                      )}
-                                    </>
-                                  )}
+                                  <div style={{ display: 'flex', gap: '10px' }}>
+                                    {isLocked ? (
+                                      <button onClick={() => showToast('Get your account verified to unlock all tests.', 'warning')} style={{ flex: 1, padding: '0.85rem', fontWeight: '700', borderRadius: '10px', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', color: '#64748b', cursor: 'pointer' }}>🔒 Unlock Required</button>
+                                    ) : user?.role === 'admin' ? (
+                                      <>
+                                        <button className="btn btn-primary" onClick={() => startTest(t)} style={{ flex: 1 }}>Preview 👁</button>
+                                        <button onClick={() => handleDeleteTest(t._id)} style={{ padding: '10px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '10px' }}>🗑</button>
+                                      </>
+                                    ) : (
+                                      <>
+                                        {completedTests.includes(t._id.toString()) ? (
+                                          <>
+                                            <button className="btn" onClick={() => startTest(t)} style={{ flex: 1, background: 'rgba(16, 185, 129, 0.1)', border: '1px solid #10b981', color: '#10b981', fontWeight: 'bold' }}>Retake (Practice)</button>
+                                            <button className="btn" onClick={() => handleViewLeaderboard(t)} style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid #f59e0b', color: '#f59e0b' }}>🏆 Ranking</button>
+                                          </>
+                                        ) : (
+                                          <button className="btn btn-primary" onClick={() => startTest(t)} style={{ flex: 1, fontWeight: 'bold', padding: '0.85rem' }}>Start Exam Now</button>
+                                        )}
+                                      </>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                           {tests.length === 0 && (
                             <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '5rem 2rem', background: 'rgba(255,255,255,0.02)', borderRadius: '30px', border: '2px dashed var(--border-glass)' }}>
                               <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1rem' }}>🎓</span>
