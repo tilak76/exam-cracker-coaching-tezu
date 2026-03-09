@@ -65,6 +65,7 @@ function App() {
   const [answers, setAnswers] = useState({});
   const [testResult, setTestResult] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
+  const [recentActivities, setRecentActivities] = useState([]);
   const [testFilter, setTestFilter] = useState('All');
 
   const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split('T')[0]);
