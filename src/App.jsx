@@ -70,12 +70,18 @@ function App() {
   const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split('T')[0]);
   const [attendanceRecords, setAttendanceRecords] = useState({});
   const [loadingAttendance, setLoadingAttendance] = useState(false);
-  const [toast, setToast] = useState({ message: '', type: 'success', visible: false });
+  const [toast, setToast] = useState({ message: '', type: 'success', visible: false, hiding: false, duration: 4000 });
   const [confirmDialog, setConfirmDialog] = useState({ visible: false, title: '', message: '', onConfirm: null });
 
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type, visible: true });
-    setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 4000);
+  const showToast = (message, type = 'success', duration = 4000) => {
+    setToast({ message, type, visible: true, hiding: false, duration });
+    setTimeout(() => setToast(prev => ({ ...prev, hiding: true })), duration - 350);
+    setTimeout(() => setToast(prev => ({ ...prev, visible: false, hiding: false })), duration);
+  };
+
+  const dismissToast = () => {
+    setToast(prev => ({ ...prev, hiding: true }));
+    setTimeout(() => setToast(prev => ({ ...prev, visible: false, hiding: false })), 350);
   };
 
   const askConfirm = (title, message, onConfirm) => {
@@ -1320,27 +1326,47 @@ function App() {
         </section>
       </main >
 
-      {/* Custom Notification Toast */}
-      {
-        toast.visible && (
-          <div className="toast-vanilla" style={{
-            position: 'fixed', bottom: '30px', right: '30px', zIndex: 12000,
-            background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '16px', padding: '12px 20px', display: 'flex', alignItems: 'center',
-            gap: '12px', boxShadow: '0 15px 40px rgba(0,0,0,0.4)', backdropFilter: 'blur(10px)',
-            animation: 'slide-in 0.3s ease-out', borderLeft: `6px solid ${toast.type === 'success' ? '#10b981' : '#ef4444'}`
+      {/* Professional Toast Notification */}
+      {toast.visible && (
+        <div className={`toast-notification${toast.hiding ? ' hiding' : ''}`}>
+          {/* Icon */}
+          <div className="toast-icon-wrap" style={{
+            background: toast.type === 'success' ? 'rgba(16,185,129,0.15)' : toast.type === 'error' ? 'rgba(239,68,68,0.15)' : 'rgba(245,158,11,0.15)'
           }}>
-            <div style={{ color: toast.type === 'success' ? '#10b981' : '#ef4444', display: 'flex' }}>
-              {toast.type === 'success' ? (
-                <svg style={{ width: '24px', height: '24px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>
-              ) : (
-                <svg style={{ width: '24px', height: '24px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              )}
-            </div>
-            <span style={{ fontSize: '0.95rem', fontWeight: '700', color: 'white', whiteSpace: 'nowrap' }}>{toast.message}</span>
+            {toast.type === 'success' && (
+              <svg width="20" height="20" fill="none" stroke="#10b981" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+            )}
+            {toast.type === 'error' && (
+              <svg width="20" height="20" fill="none" stroke="#ef4444" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            )}
+            {toast.type === 'warning' && (
+              <svg width="20" height="20" fill="none" stroke="#f59e0b" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
+            )}
+            {(toast.type === 'info' || !['success', 'error', 'warning'].includes(toast.type)) && (
+              <svg width="20" height="20" fill="none" stroke="#38bdf8" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            )}
           </div>
-        )
-      }
+
+          {/* Body */}
+          <div className="toast-body">
+            <div className="toast-title">
+              {toast.type === 'success' ? 'Success' : toast.type === 'error' ? 'Error' : toast.type === 'warning' ? 'Warning' : 'Info'}
+            </div>
+            <div className="toast-msg">{toast.message}</div>
+          </div>
+
+          {/* Close button */}
+          <button className="toast-close" onClick={dismissToast}>
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+
+          {/* Progress bar */}
+          <div className="toast-progress" style={{
+            background: toast.type === 'success' ? '#10b981' : toast.type === 'error' ? '#ef4444' : toast.type === 'warning' ? '#f59e0b' : '#38bdf8',
+            animationDuration: `${toast.duration}ms`
+          }} />
+        </div>
+      )}
 
       {/* Custom Confirmation Modal */}
       {
