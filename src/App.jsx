@@ -210,7 +210,8 @@ function App() {
         const role = authForm.email === 'tilakmishra.76@gmail.com' ? 'admin' : 'student';
         const uData = { name: authForm.name, email: authForm.email, role, isApproved: role === 'admin', createdAt: new Date().toISOString() };
         await setDoc(doc(firestoreDb, 'users', cred.user.uid), uData);
-        showToast('Registration Successful! Welcome to Exam Cracker.', 'success');
+        showToast('Registration Successful!', 'success');
+        setTimeout(() => window.location.reload(), 1200);
       }
     } catch (err) {
       let msg = err.message;
