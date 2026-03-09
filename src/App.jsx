@@ -35,7 +35,6 @@ function App() {
   const [isLoginView, setIsLoginView] = useState(true);
   const [authForm, setAuthForm] = useState({ name: '', email: '', password: '' });
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [welcomeText, setWelcomeText] = useState('Welcome back, Warrior! 🎯');
 
   const [stats, setStats] = useState([
     { title: 'Total Students', value: '0', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197', color: 'rgba(56, 189, 248, 0.2)', text: '#38bdf8' },
@@ -73,14 +72,6 @@ function App() {
   const [loadingAttendance, setLoadingAttendance] = useState(false);
   const [toast, setToast] = useState({ message: '', type: 'success', visible: false });
   const [confirmDialog, setConfirmDialog] = useState({ visible: false, title: '', message: '', onConfirm: null });
-  const [showWelcome, setShowWelcome] = useState(false);
-
-  useEffect(() => {
-    if (user && !sessionStorage.getItem('welcomeShown')) {
-      setShowWelcome(true);
-      sessionStorage.setItem('welcomeShown', 'true');
-    }
-  }, [user]);
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type, visible: true });
@@ -1380,28 +1371,6 @@ function App() {
                   Confirm
                 </button>
               </div>
-            </div>
-          </div>
-        )
-      }
-
-      {/* Refined Welcome Popup */}
-      {
-        showWelcome && (
-          <div className="modal-overlay">
-            <div className="modal-content panel" style={{ textAlign: 'center', padding: '3.5rem', background: 'rgba(15, 23, 42, 0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '32px' }}>
-              <div style={{ fontSize: '4rem', marginBottom: '1.5rem', animation: 'bounce 2s infinite' }}>🎯</div>
-              <h2 style={{ fontSize: '2.5rem', fontWeight: '900', color: 'white', marginBottom: '1rem', letterSpacing: '-0.03em' }}>{welcomeText}</h2>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '2.5rem', lineHeight: '1.6' }}>
-                Your journey to excellence continues. All your study materials and tests are ready.
-              </p>
-              <button
-                onClick={() => setShowWelcome(false)}
-                className="btn btn-primary"
-                style={{ width: '100%', padding: '1.25rem', borderRadius: '16px', fontSize: '1.1rem', fontWeight: '800' }}
-              >
-                Enter Dashboard
-              </button>
             </div>
           </div>
         )
