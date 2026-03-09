@@ -132,7 +132,14 @@ function App() {
     if (!firebaseAuth.currentUser) return;
     const unsub = onSnapshot(doc(firestoreDb, 'users', firebaseAuth.currentUser.uid), (snap) => {
       if (snap.exists()) {
-        setUser(prev => ({ ...prev, ...snap.data(), id: snap.id }));
+        const data = snap.data();
+        setUser(prev => {
+          // If approval just changed from false -> true, reload the page
+          if (prev && prev.isApproved === false && data.isApproved === true) {
+            setTimeout(() => window.location.reload(), 800);
+          }
+          return { ...prev, ...data, id: snap.id };
+        });
       }
     });
     return () => unsub();
